@@ -8,10 +8,17 @@ import {
   TrendingUp,
   BarChart3,
   Settings,
+  X,
   Zap,
   Activity,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { APP_NAME, NAV_LINKS } from '@/lib/constants';
+
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
 
 // ─── Icon map ─────────────────────────────────────────────────────────────────
 
@@ -27,23 +34,40 @@ type IconKey = keyof typeof ICON_MAP;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-space-900 border-r border-space-600">
+    <aside
+      className={cn(
+        'fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-space-900 border-r border-space-600',
+        'transition-transform duration-300 ease-in-out',
+        // Always visible on desktop; toggle-driven on mobile
+        'lg:translate-x-0',
+        isOpen ? 'translate-x-0' : '-translate-x-full',
+      )}
+    >
 
       {/* ── Logo ─────────────────────────────────────────────────────────── */}
       <div className="flex h-16 items-center gap-3 border-b border-space-600 px-5">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-500 shadow-[0_0_16px_-4px_rgba(6,182,212,0.7)]">
           <Zap className="h-4 w-4 text-white" fill="white" />
         </div>
-        <div className="leading-tight">
+        <div className="min-w-0 flex-1 leading-tight">
           <p className="text-sm font-bold tracking-tight text-white">{APP_NAME}</p>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent-400">
             Analytics
           </p>
         </div>
+        {/* Close button — mobile only */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="lg:hidden rounded-md p-1.5 text-slate-500 hover:bg-space-700 hover:text-slate-200 transition-colors"
+          aria-label="Close sidebar"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       {/* ── Navigation ───────────────────────────────────────────────────── */}
@@ -60,6 +84,7 @@ export default function Sidebar() {
               <li key={link.href}>
                 <Link
                   href={link.href}
+                  onClick={onClose}
                   className={[
                     'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
                     isActive

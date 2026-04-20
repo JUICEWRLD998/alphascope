@@ -22,6 +22,7 @@ import {
   formatAddress,
   getChangeColor,
   getScoreTextColor,
+  toFiniteNumber,
 } from '@/lib/utils';
 
 export const metadata: Metadata = {
@@ -53,27 +54,29 @@ interface Breakout {
 }
 
 function detect(token: BirdeyeTrendingToken): Breakout {
-  const volumeBreakout = token.v24hChangePercent > T.VOLUME_SURGE;
-  const priceBreakout  = token.priceChange24hPercent > T.PRICE_SPIKE;
-  const rankBreakout   = token.rank <= T.RANK_TOP && token.v24hChangePercent > T.RANK_VOL_CONFIRM;
+  const volumeChange = toFiniteNumber(token.v24hChangePercent);
+  const priceChange = toFiniteNumber(token.priceChange24hPercent);
+  const volumeBreakout = volumeChange > T.VOLUME_SURGE;
+  const priceBreakout  = priceChange > T.PRICE_SPIKE;
+  const rankBreakout   = token.rank <= T.RANK_TOP && volumeChange > T.RANK_VOL_CONFIRM;
   const isBreakout     = volumeBreakout || priceBreakout || rankBreakout;
 
   const signals: SignalKey[] = [];
   let score = 0;
 
   if (volumeBreakout) {
-    score += 20 + Math.min(15, (token.v24hChangePercent - T.VOLUME_SURGE) / 27);
+    score += 20 + Math.min(15, (volumeChange - T.VOLUME_SURGE) / 27);
     signals.push('VOLUME SURGE');
-  } else if (token.v24hChangePercent > T.VOLUME_NOTABLE) {
+  } else if (volumeChange > T.VOLUME_NOTABLE) {
     score += 8;
   }
-  if (token.priceChange24hPercent > T.PRICE_EXTREME) {
+  if (priceChange > T.PRICE_EXTREME) {
     score += 35;
     signals.push('PRICE SPIKE');
   } else if (priceBreakout) {
-    score += Math.min(25, (token.priceChange24hPercent - T.PRICE_SPIKE) * 0.7 + 10);
+    score += Math.min(25, (priceChange - T.PRICE_SPIKE) * 0.7 + 10);
     signals.push('PRICE SPIKE');
-  } else if (token.priceChange24hPercent > 5) {
+  } else if (priceChange > 5) {
     score += 5;
   }
   if (rankBreakout) { score += 20; signals.push('RANK MOVER'); }

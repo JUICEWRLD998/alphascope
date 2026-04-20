@@ -13,7 +13,7 @@ import { getTrendingTokens } from '@/services/birdeye';
 import type { BirdeyeTrendingToken } from '@/lib/types';
 import { SkeletonRow } from '@/components/ui/Skeleton';
 import Badge from '@/components/ui/Badge';
-import { cn, formatPrice, formatNumber, formatPercent, getChangeColor } from '@/lib/utils';
+import { cn, formatPrice, formatNumber, formatPercent, getChangeColor, toFiniteNumber } from '@/lib/utils';
 
 // ─── Breakout detection ──────────────────────────────────────────────────────
 
@@ -40,10 +40,12 @@ interface BreakoutResult {
 
 function detectBreakout(token: BirdeyeTrendingToken): BreakoutResult {
   const T = BREAKOUT_THRESHOLDS;
+  const volumeChange = toFiniteNumber(token.v24hChangePercent);
+  const priceChange = toFiniteNumber(token.priceChange24hPercent);
 
-  const volumeBreakout = token.v24hChangePercent > T.VOLUME_SURGE;
-  const priceBreakout  = token.priceChange24hPercent > T.PRICE_SPIKE;
-  const rankBreakout   = token.rank <= T.RANK_TOP && token.v24hChangePercent > T.RANK_VOL_CONFIRM;
+  const volumeBreakout = volumeChange > T.VOLUME_SURGE;
+  const priceBreakout  = priceChange > T.PRICE_SPIKE;
+  const rankBreakout   = token.rank <= T.RANK_TOP && volumeChange > T.RANK_VOL_CONFIRM;
   const isBreakout     = volumeBreakout || priceBreakout || rankBreakout;
 
   const signals: BreakoutSignalKey[] = [];
@@ -52,21 +54,21 @@ function detectBreakout(token: BirdeyeTrendingToken): BreakoutResult {
   // ── Volume ───────────────────────────────────────────────────────────────
   if (volumeBreakout) {
     // 20 pts base + up to 15 pts for extreme volume
-    const excess = Math.min(token.v24hChangePercent - T.VOLUME_SURGE, 400);
+    const excess = Math.min(volumeChange - T.VOLUME_SURGE, 400);
     score += 20 + Math.min(15, excess / 27);
     signals.push('VOLUME SURGE');
-  } else if (token.v24hChangePercent > T.VOLUME_NOTABLE) {
+  } else if (volumeChange > T.VOLUME_NOTABLE) {
     score += 8;
   }
 
   // ── Price ────────────────────────────────────────────────────────────────
-  if (token.priceChange24hPercent > T.PRICE_EXTREME) {
+  if (priceChange > T.PRICE_EXTREME) {
     score += 35;
     signals.push('PRICE SPIKE');
   } else if (priceBreakout) {
-    score += Math.min(25, (token.priceChange24hPercent - T.PRICE_SPIKE) * 0.7 + 10);
+    score += Math.min(25, (priceChange - T.PRICE_SPIKE) * 0.7 + 10);
     signals.push('PRICE SPIKE');
-  } else if (token.priceChange24hPercent > 5) {
+  } else if (priceChange > 5) {
     score += 5;
   }
 
@@ -132,8 +134,9 @@ function BreakoutBar({ score }: { score: number }) {
 // ─── Volume change pill ───────────────────────────────────────────────────────
 
 function VolumeChangePill({ pct }: { pct: number }) {
-  if (pct === 0) return null;
-  const positive = pct > 0;
+  const safePct = toFiniteNumber(pct);
+  if (safePct === 0) return null;
+  const positive = safePct > 0;
   return (
     <span
       className={cn(
@@ -143,7 +146,7 @@ function VolumeChangePill({ pct }: { pct: number }) {
           : 'bg-danger-500/10 text-danger-400',
       )}
     >
-      {positive ? '▲' : '▼'} {Math.abs(pct).toFixed(0)}%
+      {positive ? '▲' : '▼'} {Math.abs(safePct).toFixed(0)}%
     </span>
   );
 }

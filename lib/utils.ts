@@ -8,32 +8,44 @@ export function cn(
 
 // ─── Number formatting ───────────────────────────────────────────────────────
 
-export function formatPrice(price: number): string {
-  if (price === 0) return '$0.00';
-  if (price < 0.000001) return `$${price.toExponential(2)}`;
-  if (price < 0.01) return `$${price.toFixed(6)}`;
-  if (price < 1) return `$${price.toFixed(4)}`;
+export function toFiniteNumber(value: unknown, fallback = 0): number {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+export function formatPrice(price: number | null | undefined): string {
+  if (price === null || price === undefined) return '—';
+  const safe = toFiniteNumber(price, Number.NaN);
+  if (!Number.isFinite(safe)) return '—';
+  if (safe === 0) return '$0.00';
+  if (safe < 0.000001) return `$${safe.toExponential(2)}`;
+  if (safe < 0.01) return `$${safe.toFixed(6)}`;
+  if (safe < 1) return `$${safe.toFixed(4)}`;
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(price);
+  }).format(safe);
 }
 
 export function formatNumber(value: number | null | undefined): string {
-  if (value === null || value === undefined || isNaN(value as number)) return '—';
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
-  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
-  if (abs >= 1_000) return `${(value / 1_000).toFixed(2)}K`;
-  return value.toFixed(2);
+  if (value === null || value === undefined) return '—';
+  const safe = toFiniteNumber(value, Number.NaN);
+  if (!Number.isFinite(safe)) return '—';
+  const abs = Math.abs(safe);
+  if (abs >= 1_000_000_000) return `${(safe / 1_000_000_000).toFixed(2)}B`;
+  if (abs >= 1_000_000) return `${(safe / 1_000_000).toFixed(2)}M`;
+  if (abs >= 1_000) return `${(safe / 1_000).toFixed(2)}K`;
+  return safe.toFixed(2);
 }
 
 export function formatPercent(value: number | null | undefined, showSign = true): string {
-  if (value === null || value === undefined || isNaN(value as number)) return '—';
-  const sign = showSign && value > 0 ? '+' : '';
-  return `${sign}${value.toFixed(2)}%`;
+  if (value === null || value === undefined) return '—';
+  const safe = toFiniteNumber(value, Number.NaN);
+  if (!Number.isFinite(safe)) return '—';
+  const sign = showSign && safe > 0 ? '+' : '';
+  return `${sign}${safe.toFixed(2)}%`;
 }
 
 export function formatAddress(address: string, chars = 4): string {
@@ -80,8 +92,10 @@ export function getScoreLabel(score: number): 'HIGH' | 'MED' | 'LOW' {
   return 'LOW';
 }
 
-export function getChangeColor(change: number): string {
-  if (change > 0) return 'text-success-400';
-  if (change < 0) return 'text-danger-400';
+export function getChangeColor(change: number | null | undefined): string {
+  if (change === null || change === undefined) return 'text-slate-400';
+  const safe = toFiniteNumber(change, 0);
+  if (safe > 0) return 'text-success-400';
+  if (safe < 0) return 'text-danger-400';
   return 'text-slate-400';
 }

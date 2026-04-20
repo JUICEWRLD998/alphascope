@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
-import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Search, Bell, ChevronDown, Sun, Moon, Menu } from 'lucide-react';
 import { SUPPORTED_CHAINS } from '@/lib/constants';
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -14,7 +14,11 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/settings':  { title: 'Settings',     subtitle: 'Configure your API keys and preferences' },
 };
 
-export default function Header() {
+interface HeaderProps {
+  onMenuToggle?: () => void;
+}
+
+export default function Header({ onMenuToggle }: HeaderProps) {
   const pathname = usePathname();
   const [chain, setChain] = useState('solana');
   const [search, setSearch] = useState('');
@@ -28,7 +32,17 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-space-600 bg-space-900/80 px-6 backdrop-blur-md">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-space-600 bg-space-900/80 px-4 lg:px-6 backdrop-blur-md">
+
+      {/* ── Hamburger — mobile only ───────────────────────────────────────── */}
+      <button
+        type="button"
+        onClick={onMenuToggle}
+        className="lg:hidden rounded-lg border border-space-600 bg-space-800/70 p-2 text-slate-500 transition-all duration-150 hover:border-space-500 hover:bg-space-700 hover:text-slate-200 active:scale-95 shrink-0"
+        aria-label="Open sidebar"
+      >
+        <Menu className="h-4 w-4" />
+      </button>
 
       {/* ── Page title ───────────────────────────────────────────────────── */}
       <div className="shrink-0 min-w-0">
@@ -37,7 +51,7 @@ export default function Header() {
       </div>
 
       {/* ── Search ───────────────────────────────────────────────────────── */}
-      <div className="mx-auto w-full max-w-sm">
+      <div className="mx-auto hidden w-full max-w-sm md:block">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-600 transition-colors peer-focus:text-accent-400" />
           <input
@@ -52,10 +66,10 @@ export default function Header() {
       </div>
 
       {/* ── Controls ─────────────────────────────────────────────────────── */}
-      <div className="ml-auto flex shrink-0 items-center gap-2.5">
+      <div className="ml-auto flex shrink-0 items-center gap-2">
 
-        {/* Chain selector */}
-        <div className="relative">
+        {/* Chain selector — hidden on very small screens */}
+        <div className="relative hidden sm:block">
           <select
             value={chain}
             onChange={(e) => setChain(e.target.value)}

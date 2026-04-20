@@ -96,6 +96,70 @@ interface FetchOptions {
   params?: Record<string, string>;
 }
 
+function normalizeNumber(value: unknown, fallback = 0): number {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeString(value: unknown, fallback = ''): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+function normalizeTrendingToken(token: BirdeyeTrendingToken): BirdeyeTrendingToken {
+  return {
+    address: normalizeString(token.address),
+    symbol: normalizeString(token.symbol, 'N/A'),
+    name: normalizeString(token.name, 'Unknown Token'),
+    decimals: normalizeNumber(token.decimals),
+    logoURI: normalizeString(token.logoURI),
+    rank: normalizeNumber(token.rank),
+    price: normalizeNumber(token.price),
+    priceChange24hPercent: normalizeNumber(token.priceChange24hPercent),
+    v24hUSD: normalizeNumber(token.v24hUSD),
+    v24hChangePercent: normalizeNumber(token.v24hChangePercent),
+    mc: normalizeNumber(token.mc),
+    liquidity: normalizeNumber(token.liquidity),
+    holder: normalizeNumber(token.holder),
+    lastTradeUnixTime: normalizeNumber(token.lastTradeUnixTime),
+  };
+}
+
+function normalizeNewListing(item: BirdeyeNewListing): BirdeyeNewListing {
+  return {
+    address: normalizeString(item.address),
+    symbol: normalizeString(item.symbol, 'N/A'),
+    name: normalizeString(item.name, 'Unknown Token'),
+    decimals: normalizeNumber(item.decimals),
+    logoURI: normalizeString(item.logoURI),
+    liquidityAddedAt: normalizeNumber(item.liquidityAddedAt),
+    price: normalizeNumber(item.price),
+    liquidity: normalizeNumber(item.liquidity),
+    v24hUSD: normalizeNumber(item.v24hUSD),
+    mc: normalizeNumber(item.mc),
+  };
+}
+
+function normalizeTokenOverview(token: BirdeyeToken): BirdeyeToken {
+  return {
+    address: normalizeString(token.address),
+    symbol: normalizeString(token.symbol, 'N/A'),
+    name: normalizeString(token.name, 'Unknown Token'),
+    decimals: normalizeNumber(token.decimals),
+    logoURI: normalizeString(token.logoURI),
+    price: normalizeNumber(token.price),
+    priceChange24hPercent: normalizeNumber(token.priceChange24hPercent),
+    v24hUSD: normalizeNumber(token.v24hUSD),
+    v24hChangePercent: normalizeNumber(token.v24hChangePercent),
+    mc: normalizeNumber(token.mc),
+    liquidity: normalizeNumber(token.liquidity),
+    holder: normalizeNumber(token.holder),
+    lastTradeUnixTime: normalizeNumber(token.lastTradeUnixTime),
+    supply: normalizeNumber(token.supply),
+    circulatingSupply: normalizeNumber(token.circulatingSupply),
+    realMc: normalizeNumber(token.realMc),
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Core fetch wrapper
 // ─────────────────────────────────────────────────────────────────────────────
@@ -195,7 +259,7 @@ export async function getNewListings(
 ): Promise<ApiResponse<BirdeyeNewListingResponse>> {
   const { chain = 'solana', window = '6h', limit = 20 } = options;
 
-  return birdeyeFetch<BirdeyeNewListingResponse>('/defi/v2/tokens/new_listing', {
+  const result = await birdeyeFetch<BirdeyeNewListingResponse>('/defi/v2/tokens/new_listing', {
     chain,
     revalidate: 15,
     tags: [`new-listings-${chain}`],
@@ -206,6 +270,18 @@ export async function getNewListings(
       limit: String(Math.min(limit, 50)),
     },
   });
+
+  if (!result.success || !result.data) return result;
+
+  return {
+    success: true,
+    data: {
+      total: normalizeNumber(result.data.total),
+      items: Array.isArray(result.data.items)
+        ? result.data.items.map(normalizeNewListing)
+        : [],
+    },
+  };
 }
 
 export interface GetTrendingTokensOptions {
@@ -223,7 +299,7 @@ export async function getTrendingTokens(
 ): Promise<ApiResponse<BirdeyeTrendingResponse>> {
   const { chain = 'solana', limit = 20 } = options;
 
-  return birdeyeFetch<BirdeyeTrendingResponse>('/defi/token_trending', {
+  const result = await birdeyeFetch<BirdeyeTrendingResponse>('/defi/token_trending', {
     chain,
     revalidate: 30,
     tags: [`trending-${chain}`],
@@ -234,6 +310,20 @@ export async function getTrendingTokens(
       limit: String(Math.min(limit, 50)),
     },
   });
+
+  if (!result.success || !result.data) return result;
+
+  return {
+    success: true,
+    data: {
+      updateUnixTime: normalizeNumber(result.data.updateUnixTime),
+      updateTime: normalizeString(result.data.updateTime),
+      total: normalizeNumber(result.data.total),
+      tokens: Array.isArray(result.data.tokens)
+        ? result.data.tokens.map(normalizeTrendingToken)
+        : [],
+    },
+  };
 }
 
 export interface GetTokenOverviewOptions {
@@ -251,12 +341,19 @@ export async function getTokenOverview(
 ): Promise<ApiResponse<BirdeyeToken>> {
   const { chain = 'solana' } = options;
 
-  return birdeyeFetch<BirdeyeToken>('/defi/token_overview', {
+  const result = await birdeyeFetch<BirdeyeToken>('/defi/token_overview', {
     chain,
     revalidate: 60,
     tags: [`token-${address}`],
     params: { address },
   });
+
+  if (!result.success || !result.data) return result;
+
+  return {
+    success: true,
+    data: normalizeTokenOverview(result.data),
+  };
 }
 
 export interface GetTokenSecurityOptions {
