@@ -11,7 +11,6 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/radar':     { title: 'Token Radar',  subtitle: 'Newly launched tokens in real time' },
   '/trending':  { title: 'Trending',     subtitle: 'Volume & momentum breakouts' },
   '/scores':    { title: 'Score Board',  subtitle: 'AI-powered risk & opportunity scores' },
-  '/settings':  { title: 'Settings',     subtitle: 'Configure your API keys and preferences' },
 };
 
 interface HeaderProps {
