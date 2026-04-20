@@ -8,8 +8,7 @@ import { ExternalLink, TrendingUp, ShieldCheck, Zap, RefreshCw } from 'lucide-re
 import { cn } from '@/lib/utils';
 import { formatPrice, formatNumber, formatPercent, formatAddress, getChangeColor } from '@/lib/utils';
 import ScoreMeter from '@/components/ui/ScoreMeter';
-import type { ScoredEntry } from '../page';
-import type { Verdict, ScoreLabel } from '@/lib/types';
+import type { Verdict, ScoreLabel, ScoredEntry } from '@/lib/types';
 
 // ─── Verdict styles ───────────────────────────────────────────────────────────
 

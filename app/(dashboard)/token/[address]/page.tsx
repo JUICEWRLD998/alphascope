@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
-import { getTokenOverview, getTokenSecurity } from '@/services/birdeye';
+import { getTokenOverview } from '@/services/birdeye';
 import { generateInsight, buildInsightInput } from '@/lib/insights';
 import { scoreToken, buildScoringInput } from '@/lib/scoring';
 import type { TokenScore, BirdeyeToken, BirdeyeTokenSecurity, Verdict, ScoreLabel } from '@/lib/types';
@@ -223,12 +223,20 @@ function NotFound({ address }: { address: string }) {
       <div className="flex flex-col items-center gap-4 rounded-xl border border-danger-500/20 bg-danger-500/5 py-20 text-center">
         <ShieldOff className="h-10 w-10 text-danger-400" />
         <div>
-          <p className="font-semibold text-danger-300">Token not found</p>
-          <p className="mt-1 font-mono text-xs text-slate-500">{address}</p>
+          <p className="font-semibold text-danger-300">Token data unavailable</p>
+          <p className="mt-1 max-w-xs text-sm text-slate-500">
+            This token may be too new to be indexed, or the API is temporarily unavailable. Try again in a moment.
+          </p>
+          <p className="mt-2 font-mono text-xs text-slate-600">{address}</p>
         </div>
-        <Link href="/dashboard" className="rounded-lg bg-space-800 px-4 py-2 text-sm text-slate-300 hover:text-white">
-          Return to Dashboard
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href={address} className="rounded-lg border border-space-600 bg-space-800 px-4 py-2 text-sm text-slate-300 transition-colors hover:text-white">
+            Retry
+          </Link>
+          <Link href="/dashboard" className="rounded-lg bg-space-800 px-4 py-2 text-sm text-slate-300 hover:text-white">
+            Return to Dashboard
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -239,17 +247,14 @@ function NotFound({ address }: { address: string }) {
 export default async function TokenDetailPage({ params }: PageProps) {
   const { address } = await params;
 
-  const [overviewRes, securityRes] = await Promise.all([
-    getTokenOverview(address),
-    getTokenSecurity(address),
-  ]);
+  const overviewRes = await getTokenOverview(address);
 
   if (!overviewRes.success || !overviewRes.data) {
     return <NotFound address={address} />;
   }
 
   const token:    BirdeyeToken             = overviewRes.data;
-  const security: BirdeyeTokenSecurity | null = securityRes.success ? securityRes.data : null;
+  const security: BirdeyeTokenSecurity | null = null;
 
   const input        = buildScoringInput(token, security);
   const score        = scoreToken(input);

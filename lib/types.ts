@@ -87,6 +87,22 @@ export interface DashboardStats {
   highRiskAlerts: number;
 }
 
+/** Row shape used by ScoreBoardClient */
+export interface ScoredEntry {
+  address: string;
+  symbol: string;
+  name: string;
+  logoURI: string;
+  price: number;
+  priceChange24hPercent: number;
+  v24hUSD: number;
+  mc: number;
+  liquidity: number;
+  holder: number;
+  rank: number;
+  score: TokenScore;
+}
+
 export interface ApiResponse<T> {
   data: T;
   success: boolean;
