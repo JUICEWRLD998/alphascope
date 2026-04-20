@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Search, Bell, ChevronDown } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react';
 import { SUPPORTED_CHAINS } from '@/lib/constants';
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -17,6 +18,9 @@ export default function Header() {
   const pathname = usePathname();
   const [chain, setChain] = useState('solana');
   const [search, setSearch] = useState('');
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const page = PAGE_TITLES[pathname] ?? {
     title: 'AlphaScope',
@@ -75,6 +79,21 @@ export default function Header() {
         >
           <Bell className="h-4 w-4" />
           <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-danger-500 ring-2 ring-space-900" />
+        </button>
+
+        {/* Theme toggle */}
+        <button
+          type="button"
+          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+          className="rounded-lg border border-space-600 bg-space-800/70 p-2 text-slate-500 transition-all duration-150 hover:border-space-500 hover:bg-space-700 hover:text-slate-200 active:scale-95"
+          aria-label="Toggle theme"
+        >
+          {/* Render a fixed icon until mounted to prevent SSR/client mismatch */}
+          {!mounted || resolvedTheme === 'dark' ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </button>
 
         {/* API status pill */}
