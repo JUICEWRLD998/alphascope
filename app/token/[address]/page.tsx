@@ -19,7 +19,7 @@ import {
   Minus,
 } from 'lucide-react';
 import { getTokenOverview, getTokenSecurity } from '@/services/birdeye';
-import { generateTokenInsight } from '@/services/gemini';
+import { generateInsight, buildInsightInput } from '@/lib/insights';
 import { scoreToken, buildScoringInput } from '@/lib/scoring';
 import type { TokenScore, BirdeyeToken, BirdeyeTokenSecurity, Verdict, ScoreLabel } from '@/lib/types';
 import Badge from '@/components/ui/Badge';
@@ -438,9 +438,9 @@ export default async function TokenDetailPage({ params }: PageProps) {
   const input  = buildScoringInput(token, security);
   const score  = scoreToken(input);
 
-  // ── AI insight (runs concurrently with page render, Suspense not needed — server component) ──
-  const usingAI = !!process.env.GEMINI_API_KEY;
-  const insight = await generateTokenInsight({ token, security, score });
+  // ── AI insight — uses lib/insights.ts (Gemini when key present, rule-based fallback) ──
+  const insightInput  = buildInsightInput(token, security, score);
+  const insightResult = await generateInsight(insightInput);
 
   const verdictColors: Record<Verdict, string> = {
     BUY:   'border-success-500/30',
@@ -578,7 +578,7 @@ export default async function TokenDetailPage({ params }: PageProps) {
       </div>
 
       {/* ── AI Insight ────────────────────────────────────────────────────── */}
-      <AIPanel insight={insight} usingAI={usingAI} />
+      <AIPanel insight={insightResult.text} usingAI={insightResult.source === 'gemini'} />
 
       {/* ── Score breakdown ───────────────────────────────────────────────── */}
       <section>
