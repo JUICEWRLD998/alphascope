@@ -242,10 +242,39 @@ function scoreSecurity(input: ScoringInput): DimResult & { confidence: number } 
   const signals: ScoringSignal[] = [];
   const labels: ScoreLabel[] = [];
 
-  // No security data: return neutral with low confidence
+  // No security data: derive what we can from available token metrics
   if (!input.security) {
-    signal(signals, 'Security data not available — score estimated', 0, 'security');
-    return { score: 50, signals, labels, confidence: 0.4 };
+    let score = 60; // start slightly positive — innocent until proven guilty
+    const confidence = 0.5;
+
+    // Liquidity ratio is a strong rug-pull signal and we always have it
+    if (input.marketCap > 0) {
+      const liqRatio = input.liquidity / input.marketCap;
+      if (liqRatio < 0.03) {
+        score -= 20;
+        signal(signals, 'Liquidity < 3% of market cap — potential rug risk', -20, 'security');
+      } else if (liqRatio >= 0.10) {
+        score += 10;
+        signal(signals, 'Healthy liquidity ratio (≥ 10% of MC)', +10, 'security');
+      }
+    }
+
+    // Holder count is a reasonable proxy for distribution
+    if (input.holders < 50) {
+      score -= 20;
+      labels.push('low-holders');
+      signal(signals, `Very few holders (${input.holders}) — high concentration risk`, -20, 'security');
+    } else if (input.holders < 200) {
+      score -= 10;
+      labels.push('low-holders');
+      signal(signals, `Low holder count (${input.holders}) — limited distribution`, -10, 'security');
+    } else if (input.holders >= 1000) {
+      score += 8;
+      signal(signals, `Strong holder base (${input.holders.toLocaleString()})`, +8, 'security');
+    }
+
+    signal(signals, 'Full security audit unavailable — showing derived signals', 0, 'security');
+    return { score: clamp(score), signals, labels, confidence };
   }
 
   const sec = input.security;

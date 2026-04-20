@@ -15,7 +15,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
-  Minus,
 } from 'lucide-react';
 import { getTokenOverview, getTokenSecurity } from '@/services/birdeye';
 import { generateInsight, buildInsightInput } from '@/lib/insights';
@@ -170,51 +169,18 @@ function VerdictBanner({ score }: { score: TokenScore }) {
 
 // ─── Security flags ───────────────────────────────────────────────────────────
 
-type FlagStatus = 'good' | 'bad' | 'warn' | 'unknown';
-
-function FlagRow({ label, status, detail }: { label: string; status: FlagStatus; detail?: string }) {
-  const ICONS: Record<FlagStatus, React.ReactNode> = {
-    good:    <CheckCircle2  className="h-4 w-4 text-success-400" />,
-    bad:     <XCircle       className="h-4 w-4 text-danger-400"  />,
-    warn:    <AlertTriangle className="h-4 w-4 text-warning-400" />,
-    unknown: <Minus         className="h-4 w-4 text-slate-600"   />,
-  };
-  const TEXT: Record<FlagStatus, string> = {
-    good: 'text-success-400', bad: 'text-danger-400', warn: 'text-warning-400', unknown: 'text-slate-600',
-  };
+function SecurityPanel() {
   return (
-    <div className="flex items-center justify-between py-2.5">
-      <div className="flex items-center gap-2">
-        {ICONS[status]}
-        <span className="text-sm text-slate-300">{label}</span>
+    <div className="flex flex-col items-center gap-4 rounded-xl border border-space-700 bg-space-900 px-6 py-10 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-space-600 bg-space-800">
+        <ShieldOff className="h-6 w-6 text-slate-500" />
       </div>
-      {detail && <span className={cn('font-mono text-xs', TEXT[status])}>{detail}</span>}
-    </div>
-  );
-}
-
-function SecurityPanel({ security }: { security: BirdeyeTokenSecurity | null }) {
-  if (!security) {
-    return (
-      <div className="flex items-center gap-3 rounded-xl border border-space-700 bg-space-900 p-6 text-sm text-slate-500">
-        <ShieldOff className="h-5 w-5 shrink-0 text-slate-600" />
-        <span>Security data unavailable for this token.</span>
+      <div>
+        <p className="text-sm font-semibold text-slate-300">Security Audit — Coming Soon</p>
+        <p className="mt-1 max-w-xs text-xs leading-relaxed text-slate-600">
+          On-chain security scanning requires a higher API tier and will be available in a future update.
+        </p>
       </div>
-    );
-  }
-
-  const concPct = security.top10HolderPercent ?? security.top10UserPercent;
-  const feeBps  = security.transferFeeData?.newerTransferFee.transferFeeBasisPoints;
-
-  return (
-    <div className="rounded-xl border border-space-700 bg-space-900 divide-y divide-space-700/50 px-5">
-      <FlagRow label="Mint authority"           status={security.mintable === false ? 'good' : security.mintable === true ? 'bad' : 'unknown'} detail={security.mintable === false ? 'Disabled' : security.mintable === true ? 'Active' : '—'} />
-      <FlagRow label="Freeze authority"         status={security.freezeable === false ? 'good' : security.freezeable === true ? 'bad' : 'unknown'} detail={security.freezeable === false ? 'Disabled' : security.freezeable === true ? 'Active' : '—'} />
-      <FlagRow label="LP burned"                status={security.burnedLp === true ? 'good' : security.burnedLp === false ? 'warn' : 'unknown'} detail={security.burnedLp === true ? 'Yes' : security.burnedLp === false ? 'No' : '—'} />
-      <FlagRow label="Mutable metadata"         status={security.isMutable === false ? 'good' : security.isMutable === true ? 'warn' : 'unknown'} detail={security.isMutable === false ? 'Immutable' : security.isMutable === true ? 'Mutable' : '—'} />
-      <FlagRow label="Top-10 holder concentration" status={concPct == null ? 'unknown' : concPct >= 0.9 ? 'bad' : concPct >= 0.6 ? 'warn' : 'good'} detail={concPct != null ? `${(concPct * 100).toFixed(1)}%` : '—'} />
-      <FlagRow label="Transfer fee (Token-2022)" status={!security.transferFeeEnable ? 'good' : feeBps != null && feeBps > 300 ? 'bad' : feeBps != null && feeBps > 0 ? 'warn' : 'unknown'} detail={feeBps != null && security.transferFeeEnable ? `${(feeBps / 100).toFixed(2)}%` : 'None'} />
-      <FlagRow label="Non-transferable"         status={security.nonTransferable ? 'bad' : 'good'} detail={security.nonTransferable ? 'Yes — honeypot risk' : 'Transferable'} />
     </div>
   );
 }
@@ -402,13 +368,9 @@ export default async function TokenDetailPage({ params }: PageProps) {
         <div className="mb-3 flex items-center gap-2">
           <ShieldAlert className="h-4 w-4 text-slate-500" />
           <h2 className="text-sm font-semibold text-slate-100">Security Flags</h2>
-          {security && (
-            <Badge variant={score.security >= 70 ? 'success' : score.security >= 45 ? 'warning' : 'danger'}>
-              Score {score.security}
-            </Badge>
-          )}
+          <Badge variant="default">Coming Soon</Badge>
         </div>
-        <SecurityPanel security={security} />
+        <SecurityPanel />
       </section>
       </AnimateIn>
 

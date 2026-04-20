@@ -199,6 +199,53 @@ function BreakoutCard({ token, rank }: { token: BirdeyeTrendingToken; rank: numb
   );
 }
 
+// ─── Mobile card row (full rankings, small screens) ──────────────────────────
+
+function MobileTokenRow({ token }: { token: BirdeyeTrendingToken }) {
+  const b = detect(token);
+  return (
+    <Link
+      href={`/token/${token.address}`}
+      className={cn(
+        'flex items-center gap-3 border-b border-space-700/40 px-4 py-3 transition-colors',
+        b.isBreakout ? 'hover:bg-accent-500/5' : 'hover:bg-space-850',
+      )}
+    >
+      {/* Rank */}
+      <span className={cn('w-5 shrink-0 font-mono text-xs font-bold', token.rank <= 3 ? 'text-accent-400' : 'text-slate-600')}>
+        {token.rank}
+      </span>
+
+      {/* Logo */}
+      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-space-700">
+        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-slate-500">
+          {token.symbol.slice(0, 2).toUpperCase()}
+        </span>
+        {token.logoURI && (
+          <Image src={token.logoURI} alt={token.symbol} fill unoptimized className="rounded-full object-cover" />
+        )}
+      </div>
+
+      {/* Name + address */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-sm font-semibold text-slate-100">{token.symbol}</span>
+          {b.isBreakout && <Badge variant="accent" size="sm">BREAKOUT</Badge>}
+        </div>
+        <span className="font-mono text-[10px] text-slate-600">{formatAddress(token.address, 4)}</span>
+      </div>
+
+      {/* Price + 24h */}
+      <div className="text-right">
+        <p className="font-mono text-sm text-slate-200">{formatPrice(token.price)}</p>
+        <p className={cn('font-mono text-[10px] font-bold', getChangeColor(token.priceChange24hPercent))}>
+          {formatPercent(token.priceChange24hPercent)}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
 // ─── Full ranked table row ────────────────────────────────────────────────────
 
 function TableRow({ token }: { token: BirdeyeTrendingToken }) {
@@ -320,7 +367,7 @@ async function TrendingPageContent({ chain }: { chain: string }) {
               Active Breakouts
             </h2>
             <Badge variant="accent">{breakouts.length}</Badge>
-            <span className="ml-auto text-xs text-slate-600">
+            <span className="ml-auto hidden text-xs text-slate-600 sm:inline">
               Volume surge · Price spike · Rank movement
             </span>
           </div>
@@ -346,7 +393,16 @@ async function TrendingPageContent({ chain }: { chain: string }) {
         </div>
 
         <div className="overflow-hidden rounded-xl border border-space-700 bg-space-900">
-          <div className="overflow-x-auto">
+
+          {/* Mobile card list (hidden on md+) */}
+          <div className="md:hidden">
+            {all.map((token) => (
+              <MobileTokenRow key={token.address} token={token} />
+            ))}
+          </div>
+
+          {/* Desktop table (hidden below md) */}
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-space-700">
@@ -398,24 +454,24 @@ export default async function TrendingPage({ searchParams }: TrendingPageProps) 
 
       {/* ── Page header ──────────────────────────────────────────────────── */}
       <AnimateIn>
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-500/10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-500/10">
             <Activity className="h-5 w-5 text-accent-400" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-100">Trending Breakouts</h1>
             <p className="text-sm text-slate-500">
-              Volume surge · Price spike · Rank movement — auto-refreshes every 30 s
+              Volume surge · Price spike · Rank movement
             </p>
           </div>
         </div>
 
         {/* Live indicator */}
-        <div className="flex items-center gap-2 rounded-lg border border-space-700 bg-space-900 px-3 py-2">
+        <div className="flex w-fit items-center gap-2 rounded-lg border border-space-700 bg-space-900 px-3 py-2">
           <span className="h-2 w-2 animate-pulse rounded-full bg-success-400" />
           <span className="text-xs font-medium text-slate-400">LIVE</span>
-          <span className="text-xs text-slate-600">· refreshes every 30 s</span>
+          <span className="hidden text-xs text-slate-600 sm:inline">· refreshes every 30 s</span>
         </div>
       </div>
       </AnimateIn>
