@@ -251,7 +251,7 @@ function TableRow({ token }: { token: BirdeyeTrendingToken }) {
       <td className="px-4 py-3 text-right">
         <div>
           <p className="font-mono text-sm text-slate-200">${formatNumber(token.v24hUSD)}</p>
-          {token.v24hChangePercent !== 0 && (
+          {typeof token.v24hChangePercent === 'number' && token.v24hChangePercent !== 0 && (
             <p className={cn('font-mono text-[10px]', getChangeColor(token.v24hChangePercent))}>
               {token.v24hChangePercent > 0 ? '+' : ''}{token.v24hChangePercent.toFixed(0)}% vol
             </p>
