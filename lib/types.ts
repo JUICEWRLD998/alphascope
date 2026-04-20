@@ -62,6 +62,7 @@ export interface ApiResponse<T> {
 
 // ─── Birdeye raw response shapes ────────────────────────────────────────────
 
+/** Returned by /defi/token_overview */
 export interface BirdeyeToken {
   address: string;
   symbol: string;
@@ -70,27 +71,89 @@ export interface BirdeyeToken {
   logoURI: string;
   price: number;
   priceChange24hPercent: number;
+  v24hUSD: number;           // 24h volume in USD
+  v24hChangePercent: number; // volume change %
+  mc: number;                // market cap
+  liquidity: number;
+  holder: number;
+  lastTradeUnixTime: number;
+  supply: number;
+  circulatingSupply: number;
+  realMc: number;
+}
+
+/** Returned by /defi/token_trending (items inside the `tokens` array) */
+export interface BirdeyeTrendingToken {
+  address: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  logoURI: string;
+  rank: number;
+  price: number;
+  priceChange24hPercent: number;
   v24hUSD: number;
+  v24hChangePercent: number;
   mc: number;
   liquidity: number;
   holder: number;
   lastTradeUnixTime: number;
 }
 
-export interface BirdeyeTrendingToken extends BirdeyeToken {
-  rank: number;
-  v24hChangePercent: number;
+/** Shape of the top-level response from /defi/token_trending */
+export interface BirdeyeTrendingResponse {
+  updateUnixTime: number;
+  updateTime: string;
+  tokens: BirdeyeTrendingToken[];
+  total: number;
 }
 
-export interface BirdeyeNewToken {
+/** Returned by /defi/v2/tokens/new_listing (each item) */
+export interface BirdeyeNewListing {
   address: string;
   symbol: string;
   name: string;
   decimals: number;
   logoURI: string;
-  creationTime: number;
+  liquidityAddedAt: number; // unix timestamp
   price: number;
   liquidity: number;
   v24hUSD: number;
   mc: number;
+}
+
+/** Shape of the top-level response from /defi/v2/tokens/new_listing */
+export interface BirdeyeNewListingResponse {
+  items: BirdeyeNewListing[];
+  total: number;
+}
+
+/** Returned by /defi/token_security */
+export interface BirdeyeTokenSecurity {
+  address: string;
+  symbol: string;
+  ownerAddress: string | null;
+  creatorAddress: string | null;
+  creationTx: string | null;
+  creationTime: number | null;
+  /** What % of supply the top-10 holders control (0–1) */
+  top10HolderPercent: number | null;
+  /** What % of supply the top-10 non-contract wallets control (0–1) */
+  top10UserPercent: number | null;
+  /** Whether metadata can be updated by the authority */
+  isMutable: boolean | null;
+  /** Whether the mint authority can issue more tokens */
+  mintable: boolean | null;
+  /** Whether the freeze authority can freeze wallets */
+  freezeable: boolean | null;
+  /** Whether the LP tokens were burned */
+  burnedLp: boolean | null;
+  /** Whether the token has transfer fees (Token-2022) */
+  transferFeeEnable: boolean | null;
+  transferFeeData: {
+    newerTransferFee: { transferFeeBasisPoints: number; maximumFee: string };
+    olderTransferFee: { transferFeeBasisPoints: number; maximumFee: string };
+  } | null;
+  isToken2022: boolean;
+  nonTransferable: boolean | null;
 }

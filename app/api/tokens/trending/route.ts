@@ -9,11 +9,12 @@ export async function GET(request: NextRequest) {
     50, // cap at 50 to protect API quota
   );
 
-  const result = await getTrendingTokens(chain, limit);
+  const result = await getTrendingTokens({ chain, limit });
 
   if (!result.success) {
     return Response.json({ error: result.error }, { status: 502 });
   }
 
-  return Response.json(result.data);
+  // Return the tokens array directly for convenience
+  return Response.json(result.data.tokens ?? result.data);
 }
