@@ -3,7 +3,7 @@ import StatCard from '@/components/dashboard/StatCard';
 import NewTokenRadar from '@/components/dashboard/NewTokenRadar';
 import TrendingBreakout from '@/components/dashboard/TrendingBreakout';
 import ScoreBoard from '@/components/dashboard/ScoreBoard';
-import { MOCK_STATS, MOCK_NEW_TOKENS, MOCK_TRENDING_TOKENS } from '@/lib/mock-data';
+import { MOCK_STATS, MOCK_NEW_TOKENS } from '@/lib/mock-data';
 
 /**
  * Dashboard homepage — server component.
@@ -73,7 +73,7 @@ export default function DashboardPage() {
           <NewTokenRadar />
         </div>
         <div className="xl:col-span-2">
-          <TrendingBreakout tokens={MOCK_TRENDING_TOKENS} />
+          <TrendingBreakout />
         </div>
       </div>
 
