@@ -153,6 +153,8 @@ export interface BirdeyeNewListing {
   liquidity: number;
   v24hUSD: number;
   mc: number;
+  /** DEX / launchpad where liquidity was added (e.g. pump_amm, raydium_launchlab) */
+  source?: string;
 }
 
 /** Shape of the top-level response from /defi/v2/tokens/new_listing */

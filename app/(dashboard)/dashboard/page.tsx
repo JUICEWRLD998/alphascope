@@ -101,11 +101,11 @@ export default async function DashboardPage() {
     : MOCK_NEW_TOKENS;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
 
       {/* ── Stat cards row ────────────────────────────────────────────── */}
       <AnimateIn>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatCard
             title="Tokens Analyzed"
             value={totalTokensAnalyzed.toLocaleString()}
@@ -142,11 +142,11 @@ export default async function DashboardPage() {
 
       {/* ── New Token Radar + Trending Breakouts ──────────────────────── */}
       <AnimateIn delay={0.15}>
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-5">
-          <div className="xl:col-span-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+          <div className="lg:col-span-3">
             <NewTokenRadar />
           </div>
-          <div className="xl:col-span-2">
+          <div className="lg:col-span-2">
             <TrendingBreakout />
           </div>
         </div>

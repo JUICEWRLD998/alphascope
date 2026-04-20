@@ -80,8 +80,44 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
         <Badge variant="accent">SCORED</Badge>
       </div>
 
-      {/* ── Table ──────────────────────────────────────────────────────── */}
-      <div className="overflow-x-auto">
+      {/* ── Mobile card list (xs–md) ────────────────────────────────────── */}
+      <div className="divide-y divide-space-700 md:hidden">
+        {tokens.map((token) => {
+          const s = token.scoreSnapshot;
+          return (
+            <Link
+              key={token.address}
+              href={`/token/${token.address}`}
+              className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-space-750/70"
+            >
+              {/* Avatar */}
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-space-600 text-xs font-bold text-slate-200">
+                {token.symbol.slice(0, 2)}
+              </div>
+
+              {/* Symbol + address */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-slate-100">{token.symbol}</p>
+                  <VerdictBadge verdict={s.verdict} />
+                </div>
+                <p className="mt-0.5 font-mono text-[10px] text-slate-500">
+                  {formatAddress(token.address)}
+                </p>
+              </div>
+
+              {/* Score + price */}
+              <div className="shrink-0 text-right">
+                <p className="font-mono text-sm font-bold text-slate-100">{s.overall}</p>
+                <p className="text-[10px] text-slate-500">{formatPrice(token.price)}</p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* ── Desktop table (md+) ─────────────────────────────────────────── */}
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-space-700">
@@ -89,10 +125,10 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
                 { label: 'Token',       align: 'text-left' },
                 { label: 'Verdict',     align: 'text-left' },
                 { label: 'Overall',     align: 'text-left  w-36' },
-                { label: 'Risk',        align: 'text-left  w-32' },
-                { label: 'Opportunity', align: 'text-left  w-32' },
+                { label: 'Risk',        align: 'text-left  w-32 hidden lg:table-cell' },
+                { label: 'Opportunity', align: 'text-left  w-32 hidden lg:table-cell' },
                 { label: 'Price',       align: 'text-right' },
-                { label: 'Labels',      align: 'text-left' },
+                { label: 'Labels',      align: 'text-left  hidden xl:table-cell' },
               ].map(({ label, align }) => (
                 <th
                   key={label}
@@ -144,13 +180,13 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
                     <ScoreMeter score={s.overall} size="sm" />
                   </td>
 
-                  {/* Risk sub-score */}
-                  <td className="w-32 px-4 py-3.5">
+                  {/* Risk sub-score — hidden below lg */}
+                  <td className="hidden w-32 px-4 py-3.5 lg:table-cell">
                     <SubBar value={s.risk} color="text-danger-400" />
                   </td>
 
-                  {/* Opportunity sub-score */}
-                  <td className="w-32 px-4 py-3.5">
+                  {/* Opportunity sub-score — hidden below lg */}
+                  <td className="hidden w-32 px-4 py-3.5 lg:table-cell">
                     <SubBar value={s.opportunity} color="text-success-400" />
                   </td>
 
@@ -159,8 +195,8 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
                     {formatPrice(token.price)}
                   </td>
 
-                  {/* Labels */}
-                  <td className="px-4 py-3.5">
+                  {/* Labels — hidden below xl */}
+                  <td className="hidden px-4 py-3.5 xl:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {s.labels.slice(0, 3).map((lbl) => (
                         <Badge key={lbl} variant={LABEL_VARIANT[lbl]}>

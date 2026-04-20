@@ -9,6 +9,8 @@ import {
   TrendingUp,
   BarChart2,
   ExternalLink,
+  Droplets,
+  Radio,
 } from 'lucide-react';
 import { getNewListings } from '@/services/birdeye';
 import { scoreToken } from '@/lib/scoring';
@@ -19,7 +21,6 @@ import Badge from '@/components/ui/Badge';
 import ScoreMeter from '@/components/ui/ScoreMeter';
 import {
   cn,
-  formatPrice,
   formatNumber,
   formatAge,
   formatAddress,
@@ -46,6 +47,18 @@ function listingToScoringInput(token: BirdeyeNewListing): ScoringInput {
     security:           null,
     whaleActivityRatio: null,
   };
+}
+
+/** Convert snake_case DEX source to a readable label */
+function formatSource(source?: string): string {
+  if (!source) return 'DEX';
+  return source
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace('Amm', 'AMM')
+    .replace('Damm', 'DAMM')
+    .replace('Clamm', 'CLMM')
+    .replace('Dbc', 'DBC');
 }
 
 // ─── Verdict → style maps ─────────────────────────────────────────────────────
@@ -79,7 +92,7 @@ function TokenCard({
   return (
     <div
       className={cn(
-        'relative flex flex-col gap-4 rounded-xl border bg-space-900 p-5',
+        'relative flex flex-col gap-4 rounded-xl border bg-space-900 p-4 sm:p-5',
         'transition-all duration-200 hover:-translate-y-0.5 hover:bg-space-850 hover:shadow-xl',
         CARD_BORDER[score.verdict],
       )}
@@ -144,27 +157,39 @@ function TokenCard({
         </Badge>
       </div>
 
-      {/* ── Price + Vol + Age ── */}
-      <div className="flex items-end justify-between border-t border-space-700/50 pt-3">
+      {/* ── Liquidity + Source + Age ── */}
+      <div className="grid grid-cols-3 gap-2 border-t border-space-700/50 pt-3">
+        {/* Liquidity — always available from new listing API */}
         <div>
-          <p className="mb-0.5 text-[10px] uppercase tracking-widest text-slate-600">
-            Price
-          </p>
+          <div className="mb-1 flex items-center gap-1">
+            <Droplets className="h-2.5 w-2.5 text-accent-400" />
+            <p className="text-[10px] uppercase tracking-widest text-slate-600">Liquidity</p>
+          </div>
           <p className="font-mono text-sm font-bold text-slate-100">
-            {formatPrice(token.price)}
+            ${formatNumber(token.liquidity)}
           </p>
         </div>
+
+        {/* Source / DEX — available from new listing API */}
+        <div>
+          <div className="mb-1 flex items-center gap-1">
+            <Radio className="h-2.5 w-2.5 text-accent-400" />
+            <p className="text-[10px] uppercase tracking-widest text-slate-600">Listed on</p>
+          </div>
+          <p className="truncate text-xs font-medium text-slate-300">
+            {formatSource(token.source)}
+          </p>
+        </div>
+
+        {/* Age */}
         <div className="text-right">
-          <p className="mb-0.5 text-[10px] uppercase tracking-widest text-slate-600">
-            24h Vol
-          </p>
+          <div className="mb-1 flex items-center justify-end gap-1">
+            <Clock className="h-2.5 w-2.5 text-slate-600" />
+            <p className="text-[10px] uppercase tracking-widest text-slate-600">Age</p>
+          </div>
           <p className="font-mono text-sm text-slate-300">
-            ${formatNumber(token.v24hUSD)}
+            {formatAge(ageMinutes)}
           </p>
-        </div>
-        <div className="flex items-center gap-1 text-xs text-slate-500">
-          <Clock className="h-3 w-3" />
-          <span>{formatAge(ageMinutes)}</span>
         </div>
       </div>
 

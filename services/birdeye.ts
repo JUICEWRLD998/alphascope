@@ -106,57 +106,88 @@ function normalizeString(value: unknown, fallback = ''): string {
 }
 
 function normalizeTrendingToken(token: BirdeyeTrendingToken): BirdeyeTrendingToken {
+  // The Birdeye API returns different field names than our internal type.
+  // Cast to unknown first so we can safely access actual API field names.
+  const raw = token as unknown as Record<string, unknown>;
   return {
-    address: normalizeString(token.address),
-    symbol: normalizeString(token.symbol, 'N/A'),
-    name: normalizeString(token.name, 'Unknown Token'),
-    decimals: normalizeNumber(token.decimals),
-    logoURI: normalizeString(token.logoURI),
-    rank: normalizeNumber(token.rank),
-    price: normalizeNumber(token.price),
-    priceChange24hPercent: normalizeNumber(token.priceChange24hPercent),
-    v24hUSD: normalizeNumber(token.v24hUSD),
-    v24hChangePercent: normalizeNumber(token.v24hChangePercent),
-    mc: normalizeNumber(token.mc),
-    liquidity: normalizeNumber(token.liquidity),
-    holder: normalizeNumber(token.holder),
-    lastTradeUnixTime: normalizeNumber(token.lastTradeUnixTime),
+    address: normalizeString(raw.address as string),
+    symbol: normalizeString(raw.symbol as string, 'N/A'),
+    name: normalizeString(raw.name as string, 'Unknown Token'),
+    decimals: normalizeNumber(raw.decimals),
+    logoURI: normalizeString(raw.logoURI as string),
+    rank: normalizeNumber(raw.rank),
+    price: normalizeNumber(raw.price),
+    // API returns price24hChangePercent, our type uses priceChange24hPercent
+    priceChange24hPercent: normalizeNumber(
+      raw.price24hChangePercent ?? raw.priceChange24hPercent,
+    ),
+    // API returns volume24hUSD, our type uses v24hUSD
+    v24hUSD: normalizeNumber(raw.volume24hUSD ?? raw.v24hUSD),
+    // API returns volume24hChangePercent, our type uses v24hChangePercent
+    v24hChangePercent: normalizeNumber(
+      raw.volume24hChangePercent ?? raw.v24hChangePercent,
+    ),
+    // API returns marketcap (and fdv), our type uses mc
+    mc: normalizeNumber(raw.marketcap ?? raw.mc),
+    liquidity: normalizeNumber(raw.liquidity),
+    holder: normalizeNumber(raw.holder),
+    lastTradeUnixTime: normalizeNumber(raw.lastTradeUnixTime),
   };
 }
 
 function normalizeNewListing(item: BirdeyeNewListing): BirdeyeNewListing {
+  const raw = item as unknown as Record<string, unknown>;
+
+  // API returns liquidityAddedAt as an ISO-8601 string (e.g. "2026-04-20T19:46:26").
+  // Our type expects a unix timestamp (seconds). Handle both.
+  let liquidityAddedAt = 0;
+  const lat = raw.liquidityAddedAt;
+  if (typeof lat === 'number' && Number.isFinite(lat)) {
+    liquidityAddedAt = lat;
+  } else if (typeof lat === 'string' && lat.length > 0) {
+    const parsed = Date.parse(lat);
+    if (Number.isFinite(parsed)) liquidityAddedAt = Math.floor(parsed / 1000);
+  }
+
   return {
-    address: normalizeString(item.address),
-    symbol: normalizeString(item.symbol, 'N/A'),
-    name: normalizeString(item.name, 'Unknown Token'),
-    decimals: normalizeNumber(item.decimals),
-    logoURI: normalizeString(item.logoURI),
-    liquidityAddedAt: normalizeNumber(item.liquidityAddedAt),
-    price: normalizeNumber(item.price),
-    liquidity: normalizeNumber(item.liquidity),
-    v24hUSD: normalizeNumber(item.v24hUSD),
-    mc: normalizeNumber(item.mc),
+    address: normalizeString(raw.address as string),
+    symbol: normalizeString(raw.symbol as string, 'N/A'),
+    name: normalizeString(raw.name as string, 'Unknown Token'),
+    decimals: normalizeNumber(raw.decimals),
+    logoURI: normalizeString(raw.logoURI as string),
+    liquidityAddedAt,
+    price: normalizeNumber(raw.price ?? raw.priceUsd),
+    liquidity: normalizeNumber(raw.liquidity),
+    // New listing endpoint does not return volume or market cap
+    v24hUSD: normalizeNumber(raw.v24hUSD ?? raw.volume24hUSD),
+    mc: normalizeNumber(raw.mc ?? raw.marketcap),
+    source: typeof raw.source === 'string' ? raw.source : undefined,
   };
 }
 
 function normalizeTokenOverview(token: BirdeyeToken): BirdeyeToken {
+  const raw = token as unknown as Record<string, unknown>;
   return {
-    address: normalizeString(token.address),
-    symbol: normalizeString(token.symbol, 'N/A'),
-    name: normalizeString(token.name, 'Unknown Token'),
-    decimals: normalizeNumber(token.decimals),
-    logoURI: normalizeString(token.logoURI),
-    price: normalizeNumber(token.price),
-    priceChange24hPercent: normalizeNumber(token.priceChange24hPercent),
-    v24hUSD: normalizeNumber(token.v24hUSD),
-    v24hChangePercent: normalizeNumber(token.v24hChangePercent),
-    mc: normalizeNumber(token.mc),
-    liquidity: normalizeNumber(token.liquidity),
-    holder: normalizeNumber(token.holder),
-    lastTradeUnixTime: normalizeNumber(token.lastTradeUnixTime),
-    supply: normalizeNumber(token.supply),
-    circulatingSupply: normalizeNumber(token.circulatingSupply),
-    realMc: normalizeNumber(token.realMc),
+    address: normalizeString(raw.address as string),
+    symbol: normalizeString(raw.symbol as string, 'N/A'),
+    name: normalizeString(raw.name as string, 'Unknown Token'),
+    decimals: normalizeNumber(raw.decimals),
+    logoURI: normalizeString(raw.logoURI as string),
+    price: normalizeNumber(raw.price),
+    // API returns priceChange24hPercent (matches our type)
+    priceChange24hPercent: normalizeNumber(raw.priceChange24hPercent),
+    // API returns v24hUSD (matches our type)
+    v24hUSD: normalizeNumber(raw.v24hUSD),
+    v24hChangePercent: normalizeNumber(raw.v24hChangePercent),
+    // API returns marketCap (capital C) — our type uses mc
+    mc: normalizeNumber(raw.marketCap ?? raw.mc),
+    liquidity: normalizeNumber(raw.liquidity),
+    holder: normalizeNumber(raw.holder),
+    lastTradeUnixTime: normalizeNumber(raw.lastTradeUnixTime),
+    // API returns totalSupply — our type uses supply
+    supply: normalizeNumber(raw.totalSupply ?? raw.supply),
+    circulatingSupply: normalizeNumber(raw.circulatingSupply),
+    realMc: normalizeNumber(raw.realMc ?? raw.fdv),
   };
 }
 
@@ -454,11 +485,11 @@ import { revalidateTag } from 'next/cache';
  *   invalidateToken('So111...');
  */
 export function invalidateToken(address: string): void {
-  revalidateTag(`token-${address}`);
-  revalidateTag(`token-security-${address}`);
+  revalidateTag(`token-${address}`, 'default');
+  revalidateTag(`token-security-${address}`, 'default');
 }
 
 export function invalidateTrending(chain = 'solana'): void {
-  revalidateTag(`trending-${chain}`);
-  revalidateTag(`new-listings-${chain}`);
+  revalidateTag(`trending-${chain}`, 'default');
+  revalidateTag(`new-listings-${chain}`, 'default');
 }
