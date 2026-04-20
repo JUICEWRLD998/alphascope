@@ -1,5 +1,34 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, BarChart2, Shield, Zap, TrendingUp, Activity, Eye } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, BarChart2, Shield, Zap, TrendingUp, Activity, Eye, Brain } from 'lucide-react';
+
+// ─── Animation variants ───────────────────────────────────────────────────────
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.13 } },
+};
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 32, scale: 0.97 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
 
 // ─── Reusable primitive ───────────────────────────────────────────────────────
 
@@ -49,7 +78,10 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/6 bg-white/3 p-6 transition-colors hover:border-cyan-500/20 hover:bg-cyan-500/4">
+    <motion.div
+      variants={cardVariant}
+      className="group relative overflow-hidden rounded-2xl border border-white/6 bg-white/3 p-6 transition-colors hover:border-cyan-500/20 hover:bg-cyan-500/4"
+    >
       {/* Subtle hover glow */}
       <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{ background: 'radial-gradient(circle at 50% 0%, rgba(6,182,212,0.06) 0%, transparent 70%)' }} />
@@ -60,7 +92,7 @@ function FeatureCard({
         <h3 className="mb-2 text-base font-semibold text-slate-100">{title}</h3>
         <p className="text-sm leading-relaxed text-slate-400">{description}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -68,10 +100,10 @@ function FeatureCard({
 
 function StatPill({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 px-8">
+    <motion.div variants={fadeUp} className="flex flex-col items-center gap-1 px-8">
       <span className="font-mono text-3xl font-bold text-cyan-300 tabular-nums">{value}</span>
       <span className="text-xs text-slate-500">{label}</span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -97,7 +129,12 @@ export default function LandingPage() {
     <div className="min-h-screen overflow-x-hidden bg-[#060910] text-slate-100">
 
       {/* ═══════════════════════════════════════ NAV ═══════════════════════ */}
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/4 bg-[#060910]/80 backdrop-blur-md">
+      <motion.nav
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="fixed inset-x-0 top-0 z-50 border-b border-white/4 bg-[#060910]/80 backdrop-blur-md"
+      >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
@@ -116,7 +153,7 @@ export default function LandingPage() {
             Launch App <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* ═══════════════════════════════════════ HERO ══════════════════════ */}
       <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pb-20 pt-32 text-center">
@@ -126,45 +163,65 @@ export default function LandingPage() {
         <GlowOrb className="left-1/4  top-2/3  h-100 w-100 bg-violet-500/8" />
         <GlowOrb className="right-1/4 top-1/2  h-87.5 w-87.5 bg-cyan-400/6" />
 
-        {/* Badge */}
-        <div className="relative mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 px-4 py-1.5 text-xs font-medium text-cyan-300">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
-          Powered by Birdeye · Real-time Solana data
-        </div>
-
-        {/* Headline */}
-        <h1 className="relative mx-auto max-w-3xl text-5xl font-bold leading-tight tracking-tight text-slate-50 sm:text-6xl lg:text-7xl">
-          Detect{' '}
-          <span
-            className="bg-clip-text text-transparent"
-            style={{ backgroundImage: 'linear-gradient(135deg, #22d3ee 0%, #67e8f9 40%, #a5f3fc 100%)' }}
+        <motion.div
+          className="relative flex flex-col items-center"
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+        >
+          {/* Badge */}
+          <motion.div
+            variants={fadeUp}
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 px-4 py-1.5 text-xs font-medium text-cyan-300"
           >
-            winning tokens
-          </span>
-          {' '}before they trend
-        </h1>
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
+            Real-time onchain intelligence · Solana
+          </motion.div>
 
-        {/* Sub */}
-        <p className="relative mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
-          AlphaScope fuses real-time Birdeye data, an 5-axis risk scoring engine,
-          and Gemini AI to surface high-signal tokens the moment they emerge.
-        </p>
+          {/* Headline */}
+          <motion.h1
+            variants={fadeUp}
+            className="mx-auto max-w-3xl text-5xl font-bold leading-tight tracking-tight text-slate-50 sm:text-6xl lg:text-7xl"
+          >
+            Detect{' '}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{ backgroundImage: 'linear-gradient(135deg, #22d3ee 0%, #67e8f9 40%, #a5f3fc 100%)' }}
+            >
+              winning tokens
+            </span>
+            {' '}before they trend
+          </motion.h1>
 
-        {/* CTAs */}
-        <div className="relative mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition-all hover:bg-cyan-400 hover:shadow-cyan-400/30 active:scale-95"
+          {/* Sub */}
+          <motion.p
+            variants={fadeUp}
+            className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg"
           >
-            Launch Dashboard <ArrowRight className="h-4 w-4" />
-          </Link>
-          <a
-            href="#demo"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-slate-300 transition-all hover:border-white/20 hover:bg-white/10"
+            AlphaScope streams live onchain data through a 5-axis scoring engine
+            and AI-powered analysis to surface the tokens worth your attention —
+            seconds after they emerge.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            variants={fadeUp}
+            className="mt-10 flex flex-wrap items-center justify-center gap-3"
           >
-            <Eye className="h-4 w-4" /> View Demo
-          </a>
-        </div>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition-all hover:bg-cyan-400 hover:shadow-cyan-400/30 active:scale-95"
+            >
+              Launch Dashboard <ArrowRight className="h-4 w-4" />
+            </Link>
+            <a
+              href="#demo"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-slate-300 transition-all hover:border-white/20 hover:bg-white/10"
+            >
+              <Eye className="h-4 w-4" /> View Demo
+            </a>
+          </motion.div>
+        </motion.div>
 
         {/* Scroll nudge */}
         <div className="relative mt-20 h-px w-24 bg-linear-to-r from-transparent via-slate-700 to-transparent" />
@@ -173,12 +230,18 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════ STATS ═════════════════════ */}
       <section className="relative border-y border-white/4 bg-white/2 py-12">
         <div className="mx-auto max-w-3xl px-6">
-          <div className="flex flex-wrap items-center justify-center divide-x divide-white/6">
-            <StatPill value="5k+"   label="Tokens analyzed daily" />
-            <StatPill value="4"     label="Chains supported" />
+          <motion.div
+            className="flex flex-wrap items-center justify-center divide-x divide-white/6"
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-60px' }}
+          >
+            <StatPill value="5k+"    label="Tokens analyzed daily" />
+            <StatPill value="4"      label="Chains supported" />
             <StatPill value="5-axis" label="Scoring dimensions" />
-            <StatPill value="<1s"   label="Signal latency" />
-          </div>
+            <StatPill value="<1s"    label="Signal latency" />
+          </motion.div>
         </div>
       </section>
 
@@ -186,14 +249,26 @@ export default function LandingPage() {
       <section id="features" className="relative py-24 px-6">
         <GlowOrb className="right-0 top-1/2 h-125 w-125 -translate-y-1/2 bg-violet-500/6" />
         <div className="relative mx-auto max-w-6xl">
-          <div className="mb-14 text-center">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-cyan-500">Platform</p>
-            <h2 className="text-3xl font-bold text-slate-100 sm:text-4xl">Everything you need to find alpha</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm text-slate-500">
+          <motion.div
+            className="mb-14 text-center"
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-60px' }}
+          >
+            <motion.p variants={fadeUp} className="mb-2 text-xs font-semibold uppercase tracking-widest text-cyan-500">Platform</motion.p>
+            <motion.h2 variants={fadeUp} className="text-3xl font-bold text-slate-100 sm:text-4xl">Everything you need to find alpha</motion.h2>
+            <motion.p variants={fadeUp} className="mx-auto mt-3 max-w-lg text-sm text-slate-500">
               Three tightly integrated modules that cover the full token research loop — discovery, analysis, and decision.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            </motion.p>
+          </motion.div>
+          <motion.div
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-40px' }}
+          >
             <FeatureCard
               icon={<Zap className="h-5 w-5" />}
               title="Smart Token Radar"
@@ -211,8 +286,8 @@ export default function LandingPage() {
             />
             <FeatureCard
               icon={<Activity className="h-5 w-5" />}
-              title="Live Birdeye Data"
-              description="Price, volume, liquidity, holder count, and 40+ other metrics streamed directly from Birdeye's public API with per-endpoint configurable revalidation intervals."
+              title="Live Onchain Data"
+              description="Price, volume, liquidity, holder count, and 40+ other metrics streamed directly from Birdeye's API with per-endpoint configurable revalidation intervals."
             />
             <FeatureCard
               icon={<BarChart2 className="h-5 w-5" />}
@@ -220,11 +295,11 @@ export default function LandingPage() {
               description="Automatically checks mint authority, freeze authority, LP burn status, metadata mutability, holder concentration, and Token-2022 transfer fees for every token."
             />
             <FeatureCard
-              icon={<Eye className="h-5 w-5" />}
-              title="Gemini AI Insights"
-              description="Each token detail page gets a plain-English analysis generated by Gemini 1.5 Flash, synthesizing all scoring dimensions into a concise actionable paragraph."
+              icon={<Brain className="h-5 w-5" />}
+              title="AI-Powered Insights"
+              description="Every token gets a synthesized, plain-English analysis that distills all scoring signals into a clear, actionable summary — so you can make faster, smarter decisions."
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -232,13 +307,23 @@ export default function LandingPage() {
       <section id="demo" className="relative py-24 px-6">
         <GlowOrb className="left-1/2 top-1/2 h-175 w-175 -translate-x-1/2 -translate-y-1/2 bg-cyan-500/5" />
         <div className="relative mx-auto max-w-5xl">
-          <div className="mb-10 text-center">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-cyan-500">Live Preview</p>
-            <h2 className="text-3xl font-bold text-slate-100 sm:text-4xl">Built for speed, depth, and clarity</h2>
-          </div>
+          <motion.div
+            className="mb-10 text-center"
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-60px' }}
+          >
+            <motion.p variants={fadeUp} className="mb-2 text-xs font-semibold uppercase tracking-widest text-cyan-500">Live Preview</motion.p>
+            <motion.h2 variants={fadeUp} className="text-3xl font-bold text-slate-100 sm:text-4xl">Built for speed, depth, and clarity</motion.h2>
+          </motion.div>
 
           {/* Browser chrome mockup */}
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, margin: '-40px' }}
             className="overflow-hidden rounded-2xl border border-white/7"
             style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px -20px rgba(0,0,0,0.6), 0 0 60px -10px rgba(6,182,212,0.08)' }}
           >
@@ -342,11 +427,11 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Caption */}
           <p className="mt-4 text-center text-xs text-slate-600">
-            Actual dashboard UI — launch to see live Birdeye data.
+            Actual dashboard UI — open it to explore live onchain data.
           </p>
         </div>
       </section>
@@ -354,9 +439,15 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════ CTA ═══════════════════════ */}
       <section className="relative overflow-hidden py-32 px-6">
         <GlowOrb className="left-1/2 top-1/2 h-125 w-125 -translate-x-1/2 -translate-y-1/2 bg-cyan-500/8" />
-        <div className="relative mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-cyan-500">Get started</p>
-          <h2 className="text-4xl font-bold leading-tight text-slate-50 sm:text-5xl">
+        <motion.div
+          className="relative mx-auto max-w-2xl text-center"
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+        >
+          <motion.p variants={fadeUp} className="mb-3 text-xs font-semibold uppercase tracking-widest text-cyan-500">Get started</motion.p>
+          <motion.h2 variants={fadeUp} className="text-4xl font-bold leading-tight text-slate-50 sm:text-5xl">
             Stop chasing tokens.<br />
             <span
               className="bg-clip-text text-transparent"
@@ -364,20 +455,20 @@ export default function LandingPage() {
             >
               Start finding them.
             </span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-slate-400">
-            The dashboard is live and free. Plug in a Birdeye API key and Gemini API key, then start
-            surfacing real alpha from onchain data within minutes.
-          </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          </motion.h2>
+          <motion.p variants={fadeUp} className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-slate-400">
+            No noise. No guesswork. Just a precision signal layer between you and the
+            next breakout on-chain. Open the dashboard and start seeing what others miss.
+          </motion.p>
+          <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-8 py-3.5 text-sm font-bold text-slate-950 shadow-xl shadow-cyan-500/20 transition-all hover:bg-cyan-400 hover:shadow-cyan-400/30 active:scale-95"
             >
               Open Dashboard <ArrowRight className="h-4 w-4" />
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ═══════════════════════════════════════ FOOTER ════════════════════ */}
@@ -390,7 +481,7 @@ export default function LandingPage() {
             AlphaScope
           </div>
           <p className="text-xs text-slate-600">
-            Built with Next.js · Birdeye · Gemini AI · Tailwind CSS
+            Built with Next.js · Birdeye · Tailwind CSS
           </p>
           <div className="flex gap-4 text-xs text-slate-600">
             <Link href="/dashboard" className="transition-colors hover:text-slate-400">Dashboard</Link>

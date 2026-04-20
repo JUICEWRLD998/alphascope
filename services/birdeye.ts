@@ -361,6 +361,59 @@ export interface GetTokenSecurityOptions {
 }
 
 /**
+ * Normalise the raw Birdeye security response.
+ *
+ * Birdeye may return either:
+ *   • mintable: boolean | null          (newer API)
+ *   • mintAuthority: address | null     (older API — address present = active)
+ * Same pattern for freezeable / freezeAuthority and burnedLp / lpLockedPct.
+ */
+function normalizeTokenSecurity(raw: Record<string, unknown>): BirdeyeTokenSecurity {
+  // ── mintable ────────────────────────────────────────────────────────────────
+  let mintable: boolean | null = null;
+  if (typeof raw.mintable === 'boolean') {
+    mintable = raw.mintable;
+  } else if ('mintAuthority' in raw) {
+    mintable = raw.mintAuthority !== null && raw.mintAuthority !== undefined;
+  }
+
+  // ── freezeable ──────────────────────────────────────────────────────────────
+  let freezeable: boolean | null = null;
+  if (typeof raw.freezeable === 'boolean') {
+    freezeable = raw.freezeable;
+  } else if ('freezeAuthority' in raw) {
+    freezeable = raw.freezeAuthority !== null && raw.freezeAuthority !== undefined;
+  }
+
+  // ── burnedLp ────────────────────────────────────────────────────────────────
+  let burnedLp: boolean | null = null;
+  if (typeof raw.burnedLp === 'boolean') {
+    burnedLp = raw.burnedLp;
+  } else if (typeof raw.lpLockedPct === 'number') {
+    burnedLp = raw.lpLockedPct >= 0.95;
+  }
+
+  return {
+    address: String(raw.address ?? ''),
+    symbol: String(raw.symbol ?? ''),
+    ownerAddress: (raw.ownerAddress as string | null) ?? null,
+    creatorAddress: (raw.creatorAddress as string | null) ?? null,
+    creationTx: (raw.creationTx as string | null) ?? null,
+    creationTime: typeof raw.creationTime === 'number' ? raw.creationTime : null,
+    top10HolderPercent: typeof raw.top10HolderPercent === 'number' ? raw.top10HolderPercent : null,
+    top10UserPercent: typeof raw.top10UserPercent === 'number' ? raw.top10UserPercent : null,
+    isMutable: typeof raw.isMutable === 'boolean' ? raw.isMutable : null,
+    mintable,
+    freezeable,
+    burnedLp,
+    transferFeeEnable: typeof raw.transferFeeEnable === 'boolean' ? raw.transferFeeEnable : null,
+    transferFeeData: (raw.transferFeeData as BirdeyeTokenSecurity['transferFeeData']) ?? null,
+    isToken2022: Boolean(raw.isToken2022),
+    nonTransferable: typeof raw.nonTransferable === 'boolean' ? raw.nonTransferable : null,
+  };
+}
+
+/**
  * Fetch security flags for a token: mutable metadata, freeze authority,
  * LP burn status, concentration of top holders, and Token-2022 transfer fees.
  * Endpoint: /defi/token_security
@@ -372,12 +425,18 @@ export async function getTokenSecurity(
 ): Promise<ApiResponse<BirdeyeTokenSecurity>> {
   const { chain = 'solana' } = options;
 
-  return birdeyeFetch<BirdeyeTokenSecurity>('/defi/token_security', {
+  const result = await birdeyeFetch<Record<string, unknown>>('/defi/token_security', {
     chain,
     revalidate: 300,
     tags: [`token-security-${address}`],
     params: { address },
   });
+
+  if (!result.success || !result.data) {
+    return result as unknown as ApiResponse<BirdeyeTokenSecurity>;
+  }
+
+  return { success: true, data: normalizeTokenSecurity(result.data) };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -395,12 +454,11 @@ import { revalidateTag } from 'next/cache';
  *   invalidateToken('So111...');
  */
 export function invalidateToken(address: string): void {
-  // Empty object satisfies the CacheLifeConfig (Next.js 16) without setting expiry.
-  revalidateTag(`token-${address}`, {});
-  revalidateTag(`token-security-${address}`, {});
+  revalidateTag(`token-${address}`);
+  revalidateTag(`token-security-${address}`);
 }
 
 export function invalidateTrending(chain = 'solana'): void {
-  revalidateTag(`trending-${chain}`, {});
-  revalidateTag(`new-listings-${chain}`, {});
+  revalidateTag(`trending-${chain}`);
+  revalidateTag(`new-listings-${chain}`);
 }

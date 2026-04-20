@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ShieldAlert } from 'lucide-react';
 import NewTokenRadar, { NewTokenRadarSkeleton } from '@/components/dashboard/NewTokenRadar';
+import AnimateIn from '@/components/ui/AnimateIn';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
@@ -34,7 +35,8 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
     <div className="space-y-6">
 
       {/* ── Page header ────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <AnimateIn>
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-500/10">
             <ShieldAlert className="h-5 w-5 text-accent-400" />
@@ -65,9 +67,11 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
           ))}
         </nav>
       </div>
+      </AnimateIn>
 
       {/* ── Chain filter ────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-2">
+      <AnimateIn delay={0.1}>
+        <div className="flex flex-wrap items-center gap-2">
         {['solana', 'ethereum', 'bsc', 'base'].map((c) => (
           <a
             key={c}
@@ -85,15 +89,18 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
         <span className="ml-auto text-xs text-slate-600">
           Scores refresh every 15 s
         </span>
-      </div>
+        </div>
+      </AnimateIn>
 
       {/* ── Radar grid ─────────────────────────────────────────────────── */}
-      <Suspense
-        fallback={<NewTokenRadarSkeleton />}
-        key={`${chain}-${win}`}
-      >
-        <NewTokenRadar chain={chain} window={win} />
-      </Suspense>
+      <AnimateIn delay={0.2}>
+        <Suspense
+          fallback={<NewTokenRadarSkeleton />}
+          key={`${chain}-${win}`}
+        >
+          <NewTokenRadar chain={chain} window={win} />
+        </Suspense>
+      </AnimateIn>
 
     </div>
   );

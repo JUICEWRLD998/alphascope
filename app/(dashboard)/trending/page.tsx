@@ -14,6 +14,7 @@ import type { BirdeyeTrendingToken } from '@/lib/types';
 import { TrendingBreakoutSkeleton } from '@/components/dashboard/TrendingBreakout';
 import Badge from '@/components/ui/Badge';
 import { SkeletonCard } from '@/components/ui/Skeleton';
+import AnimateIn from '@/components/ui/AnimateIn';
 import {
   cn,
   formatPrice,
@@ -264,7 +265,7 @@ function TableRow({ token }: { token: BirdeyeTrendingToken }) {
 
       {/* Mkt cap */}
       <td className="px-4 py-3 text-right">
-        <span className="font-mono text-sm text-slate-400">${formatNumber(token.mc)}</span>
+        <span className="font-mono text-sm text-slate-400">{token.mc > 0 ? `$${formatNumber(token.mc)}` : '\u2014'}</span>
       </td>
 
       {/* Signals */}
@@ -396,6 +397,7 @@ export default async function TrendingPage({ searchParams }: TrendingPageProps) 
     <div className="space-y-6">
 
       {/* ── Page header ──────────────────────────────────────────────────── */}
+      <AnimateIn>
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-500/10">
@@ -416,8 +418,10 @@ export default async function TrendingPage({ searchParams }: TrendingPageProps) 
           <span className="text-xs text-slate-600">· refreshes every 30 s</span>
         </div>
       </div>
+      </AnimateIn>
 
       {/* ── Chain selector ────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.1}>
       <div className="flex flex-wrap items-center gap-2">
         {CHAINS.map((c) => (
           <a
@@ -434,11 +438,14 @@ export default async function TrendingPage({ searchParams }: TrendingPageProps) 
           </a>
         ))}
       </div>
+      </AnimateIn>
 
       {/* ── Content ──────────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.2}>
       <Suspense fallback={<TrendingBreakoutSkeleton />} key={chain}>
         <TrendingPageContent chain={chain} />
       </Suspense>
+      </AnimateIn>
 
     </div>
   );

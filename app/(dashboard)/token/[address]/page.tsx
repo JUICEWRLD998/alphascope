@@ -23,6 +23,7 @@ import { scoreToken, buildScoringInput } from '@/lib/scoring';
 import type { TokenScore, BirdeyeToken, BirdeyeTokenSecurity, Verdict, ScoreLabel } from '@/lib/types';
 import Badge from '@/components/ui/Badge';
 import ScoreMeter from '@/components/ui/ScoreMeter';
+import AnimateIn from '@/components/ui/AnimateIn';
 import {
   cn,
   formatPrice,
@@ -299,11 +300,14 @@ export default async function TokenDetailPage({ params }: PageProps) {
     <div className="space-y-6">
 
       {/* ── Back nav ─────────────────────────────────────────────────────── */}
-      <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-100">
-        <ArrowLeft className="h-4 w-4" /> Back to Dashboard
-      </Link>
+      <AnimateIn>
+        <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-100">
+          <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+        </Link>
+      </AnimateIn>
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.05}>
       <div className={cn('flex flex-col gap-5 rounded-xl border bg-space-900 p-6 sm:flex-row sm:items-start', verdictBorders[score.verdict])}>
         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-space-700">
           <span className="absolute inset-0 flex items-center justify-center text-lg font-bold text-slate-500">
@@ -348,11 +352,15 @@ export default async function TokenDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+      </AnimateIn>
 
-      {/* ── Verdict banner ───────────────────────────────────────────────── */}
-      <VerdictBanner score={score} />
+      {/* ── Verdict banner ────────────────────────────────────────────── */}
+      <AnimateIn delay={0.1}>
+        <VerdictBanner score={score} />
+      </AnimateIn>
 
-      {/* ── Key metrics ──────────────────────────────────────────────────── */}
+      {/* ── Key metrics ────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.15}>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard label="Volume 24h"   value={`$${formatNumber(token.v24hUSD)}`}          change={token.v24hChangePercent} icon={<BarChart2 className="h-4 w-4" />} />
         <StatCard label="Market Cap"   value={`$${formatNumber(token.mc)}`}                icon={<TrendingUp className="h-4 w-4" />} />
@@ -361,11 +369,15 @@ export default async function TokenDetailPage({ params }: PageProps) {
         <StatCard label="Circulating"  value={formatNumber(token.circulatingSupply)}       sub={`of ${formatNumber(token.supply)} total`} icon={<Zap className="h-4 w-4" />} />
         <StatCard label="Real Mkt Cap" value={`$${formatNumber(token.realMc)}`}            icon={<BarChart2 className="h-4 w-4" />} />
       </div>
+      </AnimateIn>
 
-      {/* ── AI Insight ───────────────────────────────────────────────────── */}
-      <AIPanel insight={insightResult.text} usingAI={insightResult.source === 'gemini'} />
+      {/* ── AI Insight ────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.2}>
+        <AIPanel insight={insightResult.text} usingAI={insightResult.source === 'gemini'} />
+      </AnimateIn>
 
       {/* ── Score breakdown ──────────────────────────────────────────────── */}
+      <AnimateIn delay={0.25}>
       <section>
         <div className="mb-3 flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-slate-500" />
@@ -382,8 +394,10 @@ export default async function TokenDetailPage({ params }: PageProps) {
           <ScoreCard label="Security"    score={score.security}    description="Authority flags, LP lock, concentration, and Token-2022 risks." />
         </div>
       </section>
+      </AnimateIn>
 
-      {/* ── Security flags ───────────────────────────────────────────────── */}
+      {/* ── Security flags ────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.3}>
       <section>
         <div className="mb-3 flex items-center gap-2">
           <ShieldAlert className="h-4 w-4 text-slate-500" />
@@ -396,9 +410,11 @@ export default async function TokenDetailPage({ params }: PageProps) {
         </div>
         <SecurityPanel security={security} />
       </section>
+      </AnimateIn>
 
       {/* ── Labels ───────────────────────────────────────────────────────── */}
       {score.labels.length > 0 && (
+        <AnimateIn delay={0.35}>
         <section>
           <div className="mb-3 flex items-center gap-2">
             <Zap className="h-4 w-4 text-slate-500" />
@@ -410,9 +426,11 @@ export default async function TokenDetailPage({ params }: PageProps) {
             ))}
           </div>
         </section>
+        </AnimateIn>
       )}
 
       {/* ── Signals ──────────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.4}>
       <section>
         <div className="mb-3 flex items-center gap-2">
           <BarChart2 className="h-4 w-4 text-slate-500" />
@@ -434,6 +452,7 @@ export default async function TokenDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      </AnimateIn>
 
     </div>
   );

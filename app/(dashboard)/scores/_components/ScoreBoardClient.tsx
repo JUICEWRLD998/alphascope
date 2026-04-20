@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExternalLink, TrendingUp, ShieldCheck, Zap, RefreshCw } from 'lucide-react';
@@ -140,7 +141,7 @@ function TokenCard({ entry }: { entry: ScoredEntry }) {
         </div>
         <div className="text-right">
           <p className="text-[9px] uppercase tracking-widest text-slate-600">Mkt Cap</p>
-          <p className="font-mono text-slate-400">${formatNumber(entry.mc)}</p>
+          <p className="font-mono text-slate-400">{entry.mc > 0 ? `$${formatNumber(entry.mc)}` : '\u2014'}</p>
         </div>
       </div>
 
@@ -368,12 +369,23 @@ export default function ScoreBoardClient({ entries }: { entries: ScoredEntry[] }
       </div>
 
       {/* ── Summary stats ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Tokens Scored"  value={stats.total} icon={Zap}         color="bg-accent-500/10 text-accent-400" />
-        <StatCard label="BUY Signal"     value={stats.buy}   icon={TrendingUp}   color="bg-success-500/10 text-success-400" />
-        <StatCard label="WATCH Signal"   value={stats.watch} icon={ShieldCheck}  color="bg-warning-500/10 text-warning-400" />
-        <StatCard label="AVOID Signal"   value={stats.avoid} icon={ShieldCheck}  color="bg-danger-500/10 text-danger-400" />
-      </div>
+      <motion.div
+        className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+      >
+        {[
+          { label: 'Tokens Scored', value: stats.total, icon: Zap,        color: 'bg-accent-500/10 text-accent-400' },
+          { label: 'BUY Signal',    value: stats.buy,   icon: TrendingUp,  color: 'bg-success-500/10 text-success-400' },
+          { label: 'WATCH Signal',  value: stats.watch, icon: ShieldCheck, color: 'bg-warning-500/10 text-warning-400' },
+          { label: 'AVOID Signal',  value: stats.avoid, icon: ShieldCheck, color: 'bg-danger-500/10 text-danger-400' },
+        ].map((s) => (
+          <motion.div key={s.label} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}>
+            <StatCard label={s.label} value={s.value} icon={s.icon} color={s.color} />
+          </motion.div>
+        ))}
+      </motion.div>
 
       {/* ── Filters + sort ────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -440,11 +452,18 @@ export default function ScoreBoardClient({ entries }: { entries: ScoredEntry[] }
 
       {/* ── Mobile card list ──────────────────────────────────────────────────── */}
       {displayed.length > 0 && (
-        <div className="space-y-3 xl:hidden">
+        <motion.div
+          className="space-y-3 xl:hidden"
+          initial="hidden"
+          animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+        >
           {displayed.map((entry) => (
-            <TokenCard key={entry.address} entry={entry} />
+            <motion.div key={entry.address} variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
+              <TokenCard entry={entry} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* ── Desktop table ─────────────────────────────────────────────────────── */}

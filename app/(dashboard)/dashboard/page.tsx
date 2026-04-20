@@ -3,11 +3,12 @@ import StatCard from '@/components/dashboard/StatCard';
 import NewTokenRadar from '@/components/dashboard/NewTokenRadar';
 import TrendingBreakout from '@/components/dashboard/TrendingBreakout';
 import ScoreBoard from '@/components/dashboard/ScoreBoard';
+import AnimateIn from '@/components/ui/AnimateIn';
 import { MOCK_STATS, MOCK_NEW_TOKENS } from '@/lib/mock-data';
 import { getNewListings, getTrendingTokens } from '@/services/birdeye';
 import { scoreToken } from '@/lib/scoring';
 import type { ScoringInput } from '@/lib/scoring';
-import type { BirdeyeNewListing, BirdeyeTrendingToken } from '@/lib/types';
+import type { BirdeyeNewListing, BirdeyeTrendingToken, NewToken } from '@/lib/types';
 
 // Run on every request so env vars and live data are always fresh.
 export const dynamic = 'force-dynamic';
@@ -59,56 +60,102 @@ export default async function DashboardPage() {
     ? (newItems?.length ?? 0) + (trendItems?.length ?? 0)
     : MOCK_STATS.totalTokensAnalyzed;
 
+  // Live scored tokens for the Score Board widget (top 6 trending)
+  const now = Math.floor(Date.now() / 1000);
+  const scoredItems: NewToken[] = trendItems
+    ? trendItems.slice(0, 6).map((t): NewToken => {
+        const ageMinutes = t.lastTradeUnixTime
+          ? Math.max(0, Math.floor((now - t.lastTradeUnixTime) / 60))
+          : 120;
+        const input: ScoringInput = {
+          address:         t.address,
+          price:           t.price,
+          priceChange24h:  t.priceChange24hPercent,
+          volume24h:       t.v24hUSD,
+          volumeChange24h: t.v24hChangePercent ?? 0,
+          marketCap:       t.mc,
+          liquidity:       t.liquidity,
+          holders:         t.holder,
+          ageMinutes,
+          security:           null,
+          whaleActivityRatio: null,
+        };
+        return {
+          address:         t.address,
+          symbol:          t.symbol,
+          name:            t.name,
+          logoURI:         t.logoURI || undefined,
+          price:           t.price,
+          priceChange24h:  t.priceChange24hPercent,
+          volume24h:       t.v24hUSD,
+          marketCap:       t.mc,
+          liquidity:       t.liquidity,
+          holders:         t.holder,
+          createdAt:       t.lastTradeUnixTime || now,
+          chain:           'solana',
+          age:             ageMinutes,
+          initialLiquidity: t.liquidity,
+          scoreSnapshot:   scoreToken(input),
+        };
+      })
+    : MOCK_NEW_TOKENS;
+
   return (
     <div className="space-y-6">
 
       {/* ── Stat cards row ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          title="Tokens Analyzed"
-          value={totalTokensAnalyzed.toLocaleString()}
-          subtitle="across all chains"
-          icon={<LayoutDashboard className="h-5 w-5" />}
-          accentColor="cyan"
-        />
-        <StatCard
-          title="New Tokens (24h)"
-          value={newTokens24h.toLocaleString()}
-          trend={12.4}
-          subtitle="vs yesterday"
-          icon={<Activity className="h-5 w-5" />}
-          accentColor="green"
-        />
-        <StatCard
-          title="Trending Breakouts"
-          value={trendingBreakouts}
-          trend={-8.2}
-          subtitle="active signals"
-          icon={<TrendingUp className="h-5 w-5" />}
-          accentColor="amber"
-        />
-        <StatCard
-          title="High Risk Alerts"
-          value={highRiskAlerts}
-          trend={5.1}
-          subtitle="require review"
-          icon={<ShieldAlert className="h-5 w-5" />}
-          accentColor="red"
-        />
-      </div>
+      <AnimateIn>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatCard
+            title="Tokens Analyzed"
+            value={totalTokensAnalyzed.toLocaleString()}
+            subtitle="across all chains"
+            icon={<LayoutDashboard className="h-5 w-5" />}
+            accentColor="cyan"
+          />
+          <StatCard
+            title="New Tokens (24h)"
+            value={newTokens24h.toLocaleString()}
+            trend={12.4}
+            subtitle="vs yesterday"
+            icon={<Activity className="h-5 w-5" />}
+            accentColor="green"
+          />
+          <StatCard
+            title="Trending Breakouts"
+            value={trendingBreakouts}
+            trend={-8.2}
+            subtitle="active signals"
+            icon={<TrendingUp className="h-5 w-5" />}
+            accentColor="amber"
+          />
+          <StatCard
+            title="High Risk Alerts"
+            value={highRiskAlerts}
+            trend={5.1}
+            subtitle="require review"
+            icon={<ShieldAlert className="h-5 w-5" />}
+            accentColor="red"
+          />
+        </div>
+      </AnimateIn>
 
       {/* ── New Token Radar + Trending Breakouts ──────────────────────── */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-5">
-        <div className="xl:col-span-3">
-          <NewTokenRadar />
+      <AnimateIn delay={0.15}>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-5">
+          <div className="xl:col-span-3">
+            <NewTokenRadar />
+          </div>
+          <div className="xl:col-span-2">
+            <TrendingBreakout />
+          </div>
         </div>
-        <div className="xl:col-span-2">
-          <TrendingBreakout />
-        </div>
-      </div>
+      </AnimateIn>
 
       {/* ── Score Board ───────────────────────────────────────────────── */}
-      <ScoreBoard tokens={MOCK_NEW_TOKENS} />
+      <AnimateIn delay={0.25}>
+        <ScoreBoard tokens={scoredItems} />
+      </AnimateIn>
     </div>
   );
 }
