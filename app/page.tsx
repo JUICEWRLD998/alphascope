@@ -70,7 +70,7 @@ export default function DashboardPage() {
       {/* ── New Token Radar + Trending Breakouts ──────────────────────── */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-5">
         <div className="xl:col-span-3">
-          <NewTokenRadar tokens={MOCK_NEW_TOKENS} />
+          <NewTokenRadar />
         </div>
         <div className="xl:col-span-2">
           <TrendingBreakout tokens={MOCK_TRENDING_TOKENS} />
