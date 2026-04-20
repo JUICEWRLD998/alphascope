@@ -101,14 +101,14 @@ a, button, [role="button"] {
 html.light {
   color-scheme: light;
 
-  --color-space-950: #f0f4f8;
-  --color-space-900: #e4ecf4;
-  --color-space-850: #d8e4ef;
-  --color-space-800: #c9d9e8;
-  --color-space-750: #b8cede;
-  --color-space-700: #a4bed4;
-  --color-space-600: #8aadc9;
-  --color-space-500: #6e95b7;
+  --color-space-950: #ffffff;
+  --color-space-900: #fbfdff;
+  --color-space-850: #f7faff;
+  --color-space-800: #f2f6fb;
+  --color-space-750: #ecf2f8;
+  --color-space-700: #e4ebf4;
+  --color-space-600: #d5dfeb;
+  --color-space-500: #bccadb;
 }
 
 html.light body {
@@ -125,14 +125,14 @@ html.light .text-slate-500    { color: #64748b; }
 html.light .text-slate-600    { color: #94a3b8; }
 
 /* ── Accent / semantic colors stay vibrant ─────────────────────────────────── */
-html.light .border-space-600  { border-color: #a4bed4; }
-html.light .border-space-700  { border-color: #b8cede; }
+html.light .border-space-600  { border-color: #d5dfeb; }
+html.light .border-space-700  { border-color: #e4ebf4; }
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────────── */
 html.light * {
-  scrollbar-color: #a4bed4 transparent;
+  scrollbar-color: #d5dfeb transparent;
 }
 html.light *::-webkit-scrollbar-thumb {
-  background-color: #a4bed4;
+  background-color: #d5dfeb;
 }
 
