@@ -164,10 +164,10 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
       <Link
         href={`/token/${token.address}`}
         className={cn(
-          'flex items-center gap-3 px-4 py-3 transition-colors group',
+          'flex items-center gap-3 px-4 py-3 transition-all duration-150 group',
           breakout.isBreakout
             ? 'hover:bg-accent-500/8'
-            : 'hover:bg-space-850',
+            : 'hover:bg-space-850/80',
         )}
       >
         {/* Rank */}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Search, Bell, ChevronDown, Circle } from 'lucide-react';
+import { Search, Bell, ChevronDown } from 'lucide-react';
 import { SUPPORTED_CHAINS } from '@/lib/constants';
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -35,13 +35,13 @@ export default function Header() {
       {/* ── Search ───────────────────────────────────────────────────────── */}
       <div className="mx-auto w-full max-w-sm">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-600 transition-colors peer-focus:text-accent-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search token or address…"
-            className="w-full rounded-lg border border-space-600 bg-space-800 py-2 pl-9 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-accent-500/60 focus:bg-space-750 focus:outline-none transition-colors"
+            className="peer w-full rounded-lg border border-space-600 bg-space-800/70 py-2 pl-9 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-accent-500/50 focus:bg-space-750 focus:outline-none focus:ring-1 focus:ring-accent-500/20 transition-all duration-150"
           />
         </div>
       </div>
@@ -68,17 +68,17 @@ export default function Header() {
         {/* Notifications */}
         <button
           type="button"
-          className="relative rounded-lg border border-space-600 bg-space-800 p-2 text-slate-400 transition-colors hover:border-space-500 hover:text-slate-200"
+          className="relative rounded-lg border border-space-600 bg-space-800/70 p-2 text-slate-500 transition-all duration-150 hover:border-space-500 hover:bg-space-700 hover:text-slate-200 active:scale-95"
           aria-label="Notifications"
         >
           <Bell className="h-4 w-4" />
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-danger-500" />
+          <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-danger-500 ring-2 ring-space-900" />
         </button>
 
         {/* API status pill */}
-        <div className="hidden items-center gap-1.5 rounded-lg border border-space-600 bg-space-800 px-3 py-2 sm:flex">
-          <Circle className="h-2 w-2 fill-success-400 text-success-400" />
-          <span className="text-xs text-slate-400">API</span>
+        <div className="hidden items-center gap-1.5 rounded-lg border border-space-600 bg-space-800/70 px-3 py-2 sm:flex">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success-400 shadow-[0_0_6px_0px_rgba(34,197,94,0.8)]" />
+          <span className="text-xs text-slate-400">Live</span>
         </div>
       </div>
     </header>

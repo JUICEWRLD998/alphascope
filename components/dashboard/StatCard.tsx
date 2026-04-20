@@ -13,11 +13,11 @@ interface StatCardProps {
   accentColor?: AccentColor;
 }
 
-const ACCENT: Record<AccentColor, { icon: string; ring: string; glow: string }> = {
-  cyan:  { icon: 'bg-accent-500/10  text-accent-400',  ring: 'border-accent-500/15',  glow: 'shadow-accent-500/5' },
-  green: { icon: 'bg-success-500/10 text-success-400', ring: 'border-success-500/15', glow: 'shadow-success-500/5' },
-  red:   { icon: 'bg-danger-500/10  text-danger-400',  ring: 'border-danger-500/15',  glow: 'shadow-danger-500/5' },
-  amber: { icon: 'bg-warning-500/10 text-warning-400', ring: 'border-warning-500/15', glow: 'shadow-warning-500/5' },
+const ACCENT: Record<AccentColor, { icon: string; ring: string; hover: string }> = {
+  cyan:  { icon: 'bg-accent-500/10  text-accent-400',  ring: 'border-accent-500/15',  hover: 'hover:border-accent-500/40  hover:shadow-accent-500/10' },
+  green: { icon: 'bg-success-500/10 text-success-400', ring: 'border-success-500/15', hover: 'hover:border-success-500/40 hover:shadow-success-500/10' },
+  red:   { icon: 'bg-danger-500/10  text-danger-400',  ring: 'border-danger-500/15',  hover: 'hover:border-danger-500/40  hover:shadow-danger-500/10' },
+  amber: { icon: 'bg-warning-500/10 text-warning-400', ring: 'border-warning-500/15', hover: 'hover:border-warning-500/40 hover:shadow-warning-500/10' },
 };
 
 export default function StatCard({
@@ -35,11 +35,11 @@ export default function StatCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border bg-space-800 p-5 transition-colors duration-200 hover:bg-space-750',
+        'group relative overflow-hidden rounded-xl border bg-space-800 p-5',
+        'transition-all duration-200 hover:-translate-y-0.5 hover:bg-space-750 hover:shadow-xl',
         'border-space-600',
         a.ring,
-        'shadow-lg',
-        a.glow,
+        a.hover,
       )}
     >
       {/* Gradient overlay */}
@@ -77,7 +77,7 @@ export default function StatCard({
         </div>
 
         {/* Icon */}
-        <div className={cn('flex-shrink-0 rounded-lg p-2.5', a.icon)}>
+        <div className={cn('flex-shrink-0 rounded-lg p-2.5 transition-transform duration-200 group-hover:scale-110', a.icon)}>
           {icon}
         </div>
       </div>

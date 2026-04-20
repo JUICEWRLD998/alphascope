@@ -48,7 +48,7 @@ export default function Sidebar() {
 
       {/* ── Navigation ───────────────────────────────────────────────────── */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-600">
+        <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-600">
           Menu
         </p>
         <ul className="space-y-0.5">
@@ -61,16 +61,20 @@ export default function Sidebar() {
                 <Link
                   href={link.href}
                   className={[
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                    'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
                     isActive
-                      ? 'border border-accent-500/20 bg-accent-500/10 text-accent-400'
-                      : 'text-slate-400 hover:bg-space-700 hover:text-slate-100',
+                      ? 'bg-accent-500/10 text-accent-300'
+                      : 'text-slate-500 hover:bg-space-700/60 hover:text-slate-100',
                   ].join(' ')}
                 >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  {/* Active bar */}
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-accent-400" />
+                  )}
+                  <Icon className={['h-4 w-4 flex-shrink-0 transition-transform duration-150', !isActive && 'group-hover:scale-110'].join(' ')} />
                   <span className="flex-1">{link.label}</span>
                   {isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent-400 shadow-[0_0_6px_0px_rgba(34,211,238,0.8)]" />
                   )}
                 </Link>
               </li>

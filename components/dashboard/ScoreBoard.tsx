@@ -112,7 +112,7 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
               return (
                 <tr
                   key={token.address}
-                  className="group transition-colors hover:bg-space-750"
+                  className="group transition-all duration-150 hover:bg-space-750/70"
                 >
                   {/* Token */}
                   <td className="px-4 py-3.5">

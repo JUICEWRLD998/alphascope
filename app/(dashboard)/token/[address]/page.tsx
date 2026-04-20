@@ -105,7 +105,7 @@ function StatCard({ label, value, sub, icon, change }: {
   label: string; value: string; sub?: string; icon: React.ReactNode; change?: number;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-space-700 bg-space-900 p-4">
+    <div className="flex flex-col gap-3 rounded-xl border border-space-700 bg-space-900 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-space-600 hover:bg-space-850 hover:shadow-lg">
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-600">{label}</span>
         <span className="text-slate-600">{icon}</span>
@@ -127,13 +127,13 @@ function StatCard({ label, value, sub, icon, change }: {
 
 function ScoreCard({ label, score, description }: { label: string; score: number; description: string }) {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-space-700 bg-space-900 p-4">
+    <div className="flex flex-col gap-3 rounded-xl border border-space-700 bg-space-900 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-space-600 hover:bg-space-850 hover:shadow-lg">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-400">{label}</span>
-        <span className={cn('font-mono text-lg font-bold', getScoreTextColor(score))}>{score}</span>
+        <span className="text-xs font-semibold text-slate-300">{label}</span>
+        <span className={cn('font-mono text-lg font-bold tabular-nums', getScoreTextColor(score))}>{score}</span>
       </div>
       <ScoreMeter score={score} size="sm" showLabel={false} />
-      <p className="text-[10px] leading-snug text-slate-600">{description}</p>
+      <p className="text-[10px] leading-snug text-slate-500">{description}</p>
     </div>
   );
 }
@@ -232,10 +232,10 @@ const LABEL_VARIANT: Record<ScoreLabel, 'danger' | 'success' | 'warning' | 'info
 
 function AIPanel({ insight, usingAI }: { insight: string; usingAI: boolean }) {
   return (
-    <div className="rounded-xl border border-accent-500/20 bg-accent-500/5 p-5">
+    <div className="rounded-xl border border-accent-500/20 bg-accent-500/[0.05] p-5 ring-1 ring-accent-500/10">
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-accent-400" />
-        <span className="text-sm font-semibold text-accent-300">AI Insight</span>
+        <span className="text-sm font-semibold text-accent-200">AI Insight</span>
         <Badge variant={usingAI ? 'accent' : 'default'} size="sm">
           {usingAI ? 'Gemini 1.5 Flash' : 'Rule-based'}
         </Badge>

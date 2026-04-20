@@ -67,3 +67,27 @@
 .glow-green { box-shadow: 0 0 20px -6px rgba(34, 197, 94, 0.5); }
 .glow-red   { box-shadow: 0 0 20px -6px rgba(239, 68, 68, 0.5); }
 
+/* ─── Score bar glows ─────────────────────────────────────────────────────── */
+.score-glow-green  { box-shadow: 0 0 8px 0px rgba(34, 197, 94, 0.55); }
+.score-glow-yellow { box-shadow: 0 0 8px 0px rgba(245, 158, 11, 0.55); }
+.score-glow-red    { box-shadow: 0 0 8px 0px rgba(239, 68, 68, 0.55); }
+
+/* ─── Global transition defaults ─────────────────────────────────────────── */
+a, button, [role="button"] {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* ─── Selection color ─────────────────────────────────────────────────────── */
+::selection {
+  background-color: rgba(6, 182, 212, 0.25);
+  color: #e2e8f0;
+}
+
+/* ─── Focus ring ──────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgba(6, 182, 212, 0.6);
+  outline-offset: 2px;
+}
+

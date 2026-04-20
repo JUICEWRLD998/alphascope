@@ -80,7 +80,7 @@ function TokenCard({
     <div
       className={cn(
         'relative flex flex-col gap-4 rounded-xl border bg-space-900 p-5',
-        'transition-all duration-200 hover:bg-space-850 hover:shadow-lg',
+        'transition-all duration-200 hover:-translate-y-0.5 hover:bg-space-850 hover:shadow-xl',
         CARD_BORDER[score.verdict],
       )}
     >

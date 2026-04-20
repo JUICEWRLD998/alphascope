@@ -54,10 +54,10 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
               key={opt}
               href={`/radar?window=${opt}&chain=${chain}`}
               className={[
-                'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                'rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150',
                 opt === win
-                  ? 'bg-accent-500/20 text-accent-300'
-                  : 'text-slate-500 hover:text-slate-300',
+                  ? 'bg-accent-500/20 text-accent-300 shadow-sm'
+                  : 'text-slate-500 hover:bg-space-700 hover:text-slate-200',
               ].join(' ')}
             >
               {WINDOW_LABELS[opt]}

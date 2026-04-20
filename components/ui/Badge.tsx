@@ -10,17 +10,17 @@ interface BadgeProps {
 }
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  default: 'bg-space-600 text-slate-400 border-space-500',
-  success: 'bg-success-500/10 text-success-400 border-success-500/20',
-  danger:  'bg-danger-500/10  text-danger-400  border-danger-500/20',
-  warning: 'bg-warning-500/10 text-warning-400 border-warning-500/20',
-  info:    'bg-accent-500/10  text-accent-400  border-accent-500/20',
-  accent:  'bg-accent-500/20  text-accent-300  border-accent-500/30',
+  default: 'bg-space-700 text-slate-400 ring-space-600',
+  success: 'bg-success-500/12 text-success-400 ring-success-500/25',
+  danger:  'bg-danger-500/12  text-danger-400  ring-danger-500/25',
+  warning: 'bg-warning-500/12 text-warning-400 ring-warning-500/25',
+  info:    'bg-accent-500/12  text-accent-400  ring-accent-500/25',
+  accent:  'bg-accent-500/20  text-accent-300  ring-accent-500/35',
 };
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {
-  sm: 'text-[10px] px-1.5 py-0.5 tracking-wide',
-  md: 'text-xs    px-2.5 py-1   tracking-wide',
+  sm: 'text-[9px] px-2 py-0.5 tracking-wider',
+  md: 'text-[10px] px-2.5 py-1 tracking-wider',
 };
 
 export default function Badge({
@@ -31,7 +31,7 @@ export default function Badge({
   return (
     <span
       className={[
-        'inline-flex items-center rounded border font-medium font-mono uppercase',
+        'inline-flex items-center rounded-full font-bold font-mono uppercase ring-1',
         VARIANT_CLASSES[variant],
         SIZE_CLASSES[size],
       ].join(' ')}
