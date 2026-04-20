@@ -120,7 +120,7 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
                       href={`/token/${token.address}`}
                       className="flex items-center gap-2.5"
                     >
-                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-space-600 text-xs font-bold text-slate-200">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-space-600 text-xs font-bold text-slate-200">
                         {token.symbol.slice(0, 2)}
                       </div>
                       <div className="min-w-0">

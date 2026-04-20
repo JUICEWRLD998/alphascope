@@ -43,7 +43,7 @@ export default function StatCard({
       )}
     >
       {/* Gradient overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/2 to-transparent" />
 
       <div className="relative flex items-start justify-between gap-3">
         {/* Text */}
@@ -77,7 +77,7 @@ export default function StatCard({
         </div>
 
         {/* Icon */}
-        <div className={cn('flex-shrink-0 rounded-lg p-2.5 transition-transform duration-200 group-hover:scale-110', a.icon)}>
+        <div className={cn('shrink-0 rounded-lg p-2.5 transition-transform duration-200 group-hover:scale-110', a.icon)}>
           {icon}
         </div>
       </div>

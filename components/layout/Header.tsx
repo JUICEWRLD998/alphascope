@@ -27,7 +27,7 @@ export default function Header() {
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-space-600 bg-space-900/80 px-6 backdrop-blur-md">
 
       {/* ── Page title ───────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 min-w-0">
+      <div className="shrink-0 min-w-0">
         <h1 className="truncate text-base font-semibold text-white">{page.title}</h1>
         <p className="truncate text-[11px] text-slate-500">{page.subtitle}</p>
       </div>
@@ -47,7 +47,7 @@ export default function Header() {
       </div>
 
       {/* ── Controls ─────────────────────────────────────────────────────── */}
-      <div className="ml-auto flex flex-shrink-0 items-center gap-2.5">
+      <div className="ml-auto flex shrink-0 items-center gap-2.5">
 
         {/* Chain selector */}
         <div className="relative">

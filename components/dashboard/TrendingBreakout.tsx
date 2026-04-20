@@ -108,7 +108,7 @@ function BreakoutBar({ score }: { score: number }) {
   }
 
   return (
-    <div className="flex items-end gap-[3px]" title={`Breakout score: ${score}`}>
+    <div className="flex items-end gap-0.75" title={`Breakout score: ${score}`}>
       {Array.from({ length: 5 }).map((_, i) => {
         const active = i < filled;
         // Each column is progressively taller: 7px → 11px → 15px → 19px → 23px
@@ -117,9 +117,9 @@ function BreakoutBar({ score }: { score: number }) {
           <div
             key={i}
             className={cn(
-              'w-[3px] rounded-sm transition-all duration-500',
+              'w-0.75 rounded-sm transition-all duration-500',
               barColor(i, active),
-              active && score >= 80 && 'shadow-[0_0_4px_theme(colors.success.400)]',
+              active && score >= 80 && 'shadow-[0_0_4px_var(--color-success-400)]',
             )}
             style={{ height: `${height}px` }}
           />
@@ -137,7 +137,7 @@ function VolumeChangePill({ pct }: { pct: number }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded px-1 py-[1px] font-mono text-[9px] font-bold',
+        'inline-flex items-center rounded px-1 py-px font-mono text-[9px] font-bold',
         positive
           ? 'bg-success-500/10 text-success-400'
           : 'bg-danger-500/10 text-danger-400',
@@ -157,7 +157,7 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
     <li
       className={cn(
         'relative',
-        breakout.isBreakout && 'after:absolute after:inset-y-0 after:left-0 after:w-[2px] after:rounded-full',
+        breakout.isBreakout && 'after:absolute after:inset-y-0 after:left-0 after:w-0.5 after:rounded-full',
         breakout.isBreakout && score_to_glow_bar(breakout.score),
       )}
     >
@@ -237,11 +237,11 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
 
       {/* Signal pills under row for active breakouts */}
       {breakout.isBreakout && breakout.signals.length > 0 && (
-        <div className="flex gap-1 px-[52px] pb-2 -mt-1">
+        <div className="flex gap-1 px-13 pb-2 -mt-1">
           {breakout.signals.map((sig) => (
             <span
               key={sig}
-              className="inline-flex items-center gap-0.5 rounded border border-accent-500/20 bg-accent-500/10 px-1.5 py-[2px] font-mono text-[9px] font-bold tracking-wider text-accent-400"
+              className="inline-flex items-center gap-0.5 rounded border border-accent-500/20 bg-accent-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold tracking-wider text-accent-400"
             >
               <Zap className="h-2 w-2" />
               {sig}

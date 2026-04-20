@@ -232,7 +232,7 @@ const LABEL_VARIANT: Record<ScoreLabel, 'danger' | 'success' | 'warning' | 'info
 
 function AIPanel({ insight, usingAI }: { insight: string; usingAI: boolean }) {
   return (
-    <div className="rounded-xl border border-accent-500/20 bg-accent-500/[0.05] p-5 ring-1 ring-accent-500/10">
+    <div className="rounded-xl border border-accent-500/20 bg-accent-500/5 p-5 ring-1 ring-accent-500/10">
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-accent-400" />
         <span className="text-sm font-semibold text-accent-200">AI Insight</span>

@@ -49,7 +49,7 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 transition-colors hover:border-cyan-500/20 hover:bg-cyan-500/[0.04]">
+    <div className="group relative overflow-hidden rounded-2xl border border-white/6 bg-white/3 p-6 transition-colors hover:border-cyan-500/20 hover:bg-cyan-500/4">
       {/* Subtle hover glow */}
       <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{ background: 'radial-gradient(circle at 50% 0%, rgba(6,182,212,0.06) 0%, transparent 70%)' }} />
@@ -97,7 +97,7 @@ export default function LandingPage() {
     <div className="min-h-screen overflow-x-hidden bg-[#060910] text-slate-100">
 
       {/* ═══════════════════════════════════════ NAV ═══════════════════════ */}
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.04] bg-[#060910]/80 backdrop-blur-md">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/4 bg-[#060910]/80 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
@@ -122,9 +122,9 @@ export default function LandingPage() {
       <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pb-20 pt-32 text-center">
 
         {/* Ambient glow */}
-        <GlowOrb className="left-1/2 top-1/4 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 bg-cyan-500/10" />
-        <GlowOrb className="left-1/4  top-2/3  h-[400px] w-[400px] bg-violet-500/8" />
-        <GlowOrb className="right-1/4 top-1/2  h-[350px] w-[350px] bg-cyan-400/6" />
+        <GlowOrb className="left-1/2 top-1/4 h-150 w-150 -translate-x-1/2 -translate-y-1/2 bg-cyan-500/10" />
+        <GlowOrb className="left-1/4  top-2/3  h-100 w-100 bg-violet-500/8" />
+        <GlowOrb className="right-1/4 top-1/2  h-87.5 w-87.5 bg-cyan-400/6" />
 
         {/* Badge */}
         <div className="relative mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 px-4 py-1.5 text-xs font-medium text-cyan-300">
@@ -167,13 +167,13 @@ export default function LandingPage() {
         </div>
 
         {/* Scroll nudge */}
-        <div className="relative mt-20 h-px w-24 bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
+        <div className="relative mt-20 h-px w-24 bg-linear-to-r from-transparent via-slate-700 to-transparent" />
       </section>
 
       {/* ═══════════════════════════════════════ STATS ═════════════════════ */}
-      <section className="relative border-y border-white/[0.04] bg-white/[0.02] py-12">
+      <section className="relative border-y border-white/4 bg-white/2 py-12">
         <div className="mx-auto max-w-3xl px-6">
-          <div className="flex flex-wrap items-center justify-center divide-x divide-white/[0.06]">
+          <div className="flex flex-wrap items-center justify-center divide-x divide-white/6">
             <StatPill value="5k+"   label="Tokens analyzed daily" />
             <StatPill value="4"     label="Chains supported" />
             <StatPill value="5-axis" label="Scoring dimensions" />
@@ -184,7 +184,7 @@ export default function LandingPage() {
 
       {/* ═══════════════════════════════════════ FEATURES ══════════════════ */}
       <section id="features" className="relative py-24 px-6">
-        <GlowOrb className="right-0 top-1/2 h-[500px] w-[500px] -translate-y-1/2 bg-violet-500/6" />
+        <GlowOrb className="right-0 top-1/2 h-125 w-125 -translate-y-1/2 bg-violet-500/6" />
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-14 text-center">
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-cyan-500">Platform</p>
@@ -230,7 +230,7 @@ export default function LandingPage() {
 
       {/* ═══════════════════════════════════════ DEMO ══════════════════════ */}
       <section id="demo" className="relative py-24 px-6">
-        <GlowOrb className="left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 bg-cyan-500/5" />
+        <GlowOrb className="left-1/2 top-1/2 h-175 w-175 -translate-x-1/2 -translate-y-1/2 bg-cyan-500/5" />
         <div className="relative mx-auto max-w-5xl">
           <div className="mb-10 text-center">
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-cyan-500">Live Preview</p>
@@ -239,11 +239,11 @@ export default function LandingPage() {
 
           {/* Browser chrome mockup */}
           <div
-            className="overflow-hidden rounded-2xl border border-white/[0.07]"
+            className="overflow-hidden rounded-2xl border border-white/7"
             style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px -20px rgba(0,0,0,0.6), 0 0 60px -10px rgba(6,182,212,0.08)' }}
           >
             {/* Title bar */}
-            <div className="flex items-center gap-2 border-b border-white/[0.06] bg-[#0d1117] px-4 py-3">
+            <div className="flex items-center gap-2 border-b border-white/6 bg-[#0d1117] px-4 py-3">
               <div className="flex gap-1.5">
                 <div className="h-3 w-3 rounded-full bg-red-500/40" />
                 <div className="h-3 w-3 rounded-full bg-yellow-500/40" />
@@ -257,7 +257,7 @@ export default function LandingPage() {
             {/* Dashboard shell mockup */}
             <div className="flex bg-[#070b10]" style={{ minHeight: '420px' }}>
               {/* Sidebar strip */}
-              <div className="hidden w-44 shrink-0 flex-col border-r border-white/[0.04] bg-[#0a0e14] p-4 sm:flex">
+              <div className="hidden w-44 shrink-0 flex-col border-r border-white/4 bg-[#0a0e14] p-4 sm:flex">
                 <div className="mb-6 flex items-center gap-2">
                   <div className="h-6 w-6 rounded-md bg-cyan-500/20" />
                   <div className="h-2 w-16 rounded-full bg-slate-700" />
@@ -288,7 +288,7 @@ export default function LandingPage() {
                     { label: 'Market Cap',  val: '$18.2M', up: false },
                     { label: 'Holders',     val: '1,240',  up: true  },
                   ].map((c) => (
-                    <div key={c.label} className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-3">
+                    <div key={c.label} className="rounded-xl border border-white/5 bg-white/2 p-3">
                       <div className="mb-2 text-[8px] text-slate-600">{c.label}</div>
                       <div className="mb-1 font-mono text-sm font-bold text-slate-200">{c.val}</div>
                       <div className={`text-[9px] font-mono ${c.up ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -301,7 +301,7 @@ export default function LandingPage() {
                 {/* Two-column lower area */}
                 <div className="grid grid-cols-2 gap-3">
                   {/* Token list */}
-                  <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-3">
+                  <div className="rounded-xl border border-white/5 bg-white/2 p-3">
                     <div className="mb-3 flex items-center justify-between">
                       <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-600">New Tokens</span>
                       <span className="rounded bg-cyan-500/10 px-1.5 py-0.5 text-[8px] text-cyan-400">LIVE</span>
@@ -325,7 +325,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Score panel */}
-                  <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-3">
+                  <div className="rounded-xl border border-white/5 bg-white/2 p-3">
                     <div className="mb-3 text-[9px] font-semibold uppercase tracking-widest text-slate-600">Score Breakdown</div>
                     <div className="space-y-2">
                       <MockScoreBar label="Risk"        score={82} color="bg-emerald-500" />
@@ -353,7 +353,7 @@ export default function LandingPage() {
 
       {/* ═══════════════════════════════════════ CTA ═══════════════════════ */}
       <section className="relative overflow-hidden py-32 px-6">
-        <GlowOrb className="left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 bg-cyan-500/8" />
+        <GlowOrb className="left-1/2 top-1/2 h-125 w-125 -translate-x-1/2 -translate-y-1/2 bg-cyan-500/8" />
         <div className="relative mx-auto max-w-2xl text-center">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-cyan-500">Get started</p>
           <h2 className="text-4xl font-bold leading-tight text-slate-50 sm:text-5xl">
@@ -381,7 +381,7 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════ FOOTER ════════════════════ */}
-      <footer className="border-t border-white/[0.04] bg-[#060910] py-10 px-6">
+      <footer className="border-t border-white/4 bg-[#060910] py-10 px-6">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-400">
             <span className="flex h-6 w-6 items-center justify-center rounded-md bg-cyan-500/20 text-cyan-400">

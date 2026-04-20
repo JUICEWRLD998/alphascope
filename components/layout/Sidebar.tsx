@@ -35,7 +35,7 @@ export default function Sidebar() {
 
       {/* ── Logo ─────────────────────────────────────────────────────────── */}
       <div className="flex h-16 items-center gap-3 border-b border-space-600 px-5">
-        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-accent-500 shadow-[0_0_16px_-4px_rgba(6,182,212,0.7)]">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-500 shadow-[0_0_16px_-4px_rgba(6,182,212,0.7)]">
           <Zap className="h-4 w-4 text-white" fill="white" />
         </div>
         <div className="leading-tight">
@@ -71,7 +71,7 @@ export default function Sidebar() {
                   {isActive && (
                     <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-accent-400" />
                   )}
-                  <Icon className={['h-4 w-4 flex-shrink-0 transition-transform duration-150', !isActive && 'group-hover:scale-110'].join(' ')} />
+                  <Icon className={['h-4 w-4 shrink-0 transition-transform duration-150', !isActive && 'group-hover:scale-110'].join(' ')} />
                   <span className="flex-1">{link.label}</span>
                   {isActive && (
                     <span className="h-1.5 w-1.5 rounded-full bg-accent-400 shadow-[0_0_6px_0px_rgba(34,211,238,0.8)]" />
