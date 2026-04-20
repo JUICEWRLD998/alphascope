@@ -2,22 +2,51 @@ import Link from 'next/link';
 import Badge from '@/components/ui/Badge';
 import ScoreMeter from '@/components/ui/ScoreMeter';
 import { formatPrice, formatAddress } from '@/lib/utils';
-import type { NewToken, ScoreLabel } from '@/lib/types';
+import type { NewToken, ScoreLabel, Verdict } from '@/lib/types';
 
 interface ScoreBoardProps {
   tokens: NewToken[];
 }
 
 const LABEL_VARIANT: Record<ScoreLabel, 'danger' | 'success' | 'warning' | 'info' | 'accent' | 'default'> = {
-  'high-risk':      'danger',
-  'low-liquidity':  'warning',
-  'new-token':      'info',
-  'trending':       'accent',
-  'breakout':       'success',
-  'whale-activity': 'warning',
-  'low-holders':    'danger',
-  'high-volume':    'success',
+  'high-risk':            'danger',
+  'low-liquidity':        'warning',
+  'new-token':            'info',
+  'trending':             'accent',
+  'breakout':             'success',
+  'whale-activity':       'warning',
+  'low-holders':          'danger',
+  'high-volume':          'success',
+  'concentrated-supply':  'danger',
+  'lp-burned':            'success',
+  'mintable':             'danger',
+  'freezeable':           'danger',
+  'transfer-fee':         'warning',
+  'mutable-metadata':     'warning',
+  'volume-spike':         'accent',
+  'price-breakout':       'success',
+  'low-mcap-gem':         'accent',
+  'honeypot-risk':        'danger',
 };
+
+const VERDICT_STYLE: Record<Verdict, { bg: string; text: string; dot: string }> = {
+  BUY:   { bg: 'bg-success-500/10 border-success-500/20', text: 'text-success-400', dot: 'bg-success-400' },
+  WATCH: { bg: 'bg-warning-500/10 border-warning-500/20', text: 'text-warning-400', dot: 'bg-warning-400' },
+  AVOID: { bg: 'bg-danger-500/10  border-danger-500/20',  text: 'text-danger-400',  dot: 'bg-danger-400'  },
+};
+
+function VerdictBadge({ verdict }: { verdict: Verdict }) {
+  const s = VERDICT_STYLE[verdict];
+  return (
+    <span className={[
+      'inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase',
+      s.bg, s.text,
+    ].join(' ')}>
+      <span className={['h-1.5 w-1.5 rounded-full', s.dot].join(' ')} />
+      {verdict}
+    </span>
+  );
+}
 
 /** Inline mini-bar (used for risk / opportunity sub-scores) */
 function SubBar({ value, color }: { value: number; color: string }) {
@@ -58,6 +87,7 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
             <tr className="border-b border-space-700">
               {[
                 { label: 'Token',       align: 'text-left' },
+                { label: 'Verdict',     align: 'text-left' },
                 { label: 'Overall',     align: 'text-left  w-36' },
                 { label: 'Risk',        align: 'text-left  w-32' },
                 { label: 'Opportunity', align: 'text-left  w-32' },
@@ -104,6 +134,11 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
                     </Link>
                   </td>
 
+                  {/* Verdict */}
+                  <td className="px-4 py-3.5">
+                    <VerdictBadge verdict={s.verdict} />
+                  </td>
+
                   {/* Overall score */}
                   <td className="w-36 px-4 py-3.5">
                     <ScoreMeter score={s.overall} size="sm" />
@@ -127,11 +162,14 @@ export default function ScoreBoard({ tokens }: ScoreBoardProps) {
                   {/* Labels */}
                   <td className="px-4 py-3.5">
                     <div className="flex flex-wrap gap-1">
-                      {s.labels.map((lbl) => (
+                      {s.labels.slice(0, 3).map((lbl) => (
                         <Badge key={lbl} variant={LABEL_VARIANT[lbl]}>
                           {lbl}
                         </Badge>
                       ))}
+                      {s.labels.length > 3 && (
+                        <Badge variant="default">+{s.labels.length - 3}</Badge>
+                      )}
                     </div>
                   </td>
                 </tr>

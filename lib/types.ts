@@ -8,16 +8,49 @@ export type ScoreLabel =
   | 'breakout'
   | 'whale-activity'
   | 'low-holders'
-  | 'high-volume';
+  | 'high-volume'
+  | 'concentrated-supply'
+  | 'lp-burned'
+  | 'mintable'
+  | 'freezeable'
+  | 'transfer-fee'
+  | 'mutable-metadata'
+  | 'volume-spike'
+  | 'price-breakout'
+  | 'low-mcap-gem'
+  | 'honeypot-risk';
 
+export type Verdict = 'BUY' | 'WATCH' | 'AVOID';
+
+/** The full scored output for one token */
 export interface TokenScore {
   address: string;
-  overall: number;      // 0–100 composite
-  risk: number;         // 0–100, higher = safer
-  opportunity: number;  // 0–100, higher = better
+  // ── Core scores ────────────────────────────────────────────────
+  overall: number;      // 0–100 weighted composite
+  risk: number;         // 0–100 — higher means SAFER (lower risk)
+  opportunity: number;  // 0–100 — higher means more upside
   momentum: number;     // 0–100
-  liquidity: number;    // 0–100
+  liquidity: number;    // 0–100 normalised liquidity score
+  security: number;     // 0–100 — higher means cleaner security posture
+  // ── Verdict ────────────────────────────────────────────────────
+  verdict: Verdict;
+  verdictReason: string;
+  // ── Signal breakdown ───────────────────────────────────────────
   labels: ScoreLabel[];
+  signals: ScoringSignal[];
+  // ── Confidence ─────────────────────────────────────────────────
+  /** 0–1: how much data was available (missing security = lower) */
+  confidence: number;
+  computedAt: number; // unix ms
+}
+
+/** A single human-readable scoring signal with its point impact */
+export interface ScoringSignal {
+  label: string;
+  impact: 'positive' | 'negative' | 'neutral';
+  /** The raw point delta this signal contributed (+/-) */
+  delta: number;
+  category: 'risk' | 'opportunity' | 'momentum' | 'security' | 'liquidity';
 }
 
 export interface Token {

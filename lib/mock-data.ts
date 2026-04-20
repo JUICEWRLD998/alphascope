@@ -5,6 +5,37 @@
  */
 import type { NewToken, TrendingToken, DashboardStats } from '@/lib/types';
 
+/** Minimal stub so mock scores satisfy the updated TokenScore shape. */
+function stub(
+  address: string,
+  overall: number,
+  risk: number,
+  opportunity: number,
+  momentum: number,
+  liquidity: number,
+  security: number,
+): NewToken['scoreSnapshot'] {
+  const verdict =
+    overall >= 72 && risk >= 55 ? 'BUY' :
+    overall < 30 || risk < 20   ? 'AVOID' :
+                                   'WATCH';
+  return {
+    address,
+    overall,
+    risk,
+    opportunity,
+    momentum,
+    liquidity,
+    security,
+    verdict,
+    verdictReason: 'Mock score — replace with live scoring engine.',
+    labels: [],
+    signals: [],
+    confidence: 0.8,
+    computedAt: Date.now(),
+  };
+}
+
 const NOW = Math.floor(Date.now() / 1000);
 
 export const MOCK_STATS: DashboardStats = {
@@ -29,15 +60,7 @@ export const MOCK_NEW_TOKENS: NewToken[] = [
     chain: 'solana',
     age: 60,
     initialLiquidity: 50_000,
-    scoreSnapshot: {
-      address: '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr',
-      overall: 72,
-      risk: 65,
-      opportunity: 79,
-      momentum: 88,
-      liquidity: 58,
-      labels: ['new-token', 'trending'],
-    },
+    scoreSnapshot: stub('7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr', 72, 65, 79, 88, 58, 70),
   },
   {
     address: 'SAGEyyVkHbv3RgAEuVU4rVNnLuXNdNHECRkWXmmYDxH',
@@ -53,15 +76,7 @@ export const MOCK_NEW_TOKENS: NewToken[] = [
     chain: 'solana',
     age: 95,
     initialLiquidity: 20_000,
-    scoreSnapshot: {
-      address: 'SAGEyyVkHbv3RgAEuVU4rVNnLuXNdNHECRkWXmmYDxH',
-      overall: 58,
-      risk: 50,
-      opportunity: 66,
-      momentum: 62,
-      liquidity: 42,
-      labels: ['new-token', 'low-liquidity'],
-    },
+    scoreSnapshot: stub('SAGEyyVkHbv3RgAEuVU4rVNnLuXNdNHECRkWXmmYDxH', 58, 50, 66, 62, 42, 55),
   },
   {
     address: 'FLUXbqbAJ94zVNrUmFkVwMFYmfG3suPJiXtF7BNZM8sP',
@@ -77,15 +92,7 @@ export const MOCK_NEW_TOKENS: NewToken[] = [
     chain: 'solana',
     age: 180,
     initialLiquidity: 150_000,
-    scoreSnapshot: {
-      address: 'FLUXbqbAJ94zVNrUmFkVwMFYmfG3suPJiXtF7BNZM8sP',
-      overall: 41,
-      risk: 38,
-      opportunity: 44,
-      momentum: 31,
-      liquidity: 67,
-      labels: ['high-risk', 'high-volume'],
-    },
+    scoreSnapshot: stub('FLUXbqbAJ94zVNrUmFkVwMFYmfG3suPJiXtF7BNZM8sP', 41, 38, 44, 31, 67, 48),
   },
   {
     address: 'ORBIqjVbzAnPcYz4VNsJzQoeMpJpbKWHHSCaZ4Nv3sU',
@@ -101,15 +108,7 @@ export const MOCK_NEW_TOKENS: NewToken[] = [
     chain: 'solana',
     age: 12,
     initialLiquidity: 40_000,
-    scoreSnapshot: {
-      address: 'ORBIqjVbzAnPcYz4VNsJzQoeMpJpbKWHHSCaZ4Nv3sU',
-      overall: 85,
-      risk: 80,
-      opportunity: 90,
-      momentum: 97,
-      liquidity: 61,
-      labels: ['new-token', 'breakout', 'whale-activity'],
-    },
+    scoreSnapshot: stub('ORBIqjVbzAnPcYz4VNsJzQoeMpJpbKWHHSCaZ4Nv3sU', 85, 80, 90, 97, 61, 78),
   },
   {
     address: 'LUMAprotXb1GKqQZqXL9WK6M4VuJRwNVEWmQDiZQaP3s',
@@ -125,15 +124,7 @@ export const MOCK_NEW_TOKENS: NewToken[] = [
     chain: 'solana',
     age: 35,
     initialLiquidity: 80_000,
-    scoreSnapshot: {
-      address: 'LUMAprotXb1GKqQZqXL9WK6M4VuJRwNVEWmQDiZQaP3s',
-      overall: 78,
-      risk: 72,
-      opportunity: 84,
-      momentum: 91,
-      liquidity: 70,
-      labels: ['trending', 'breakout', 'high-volume'],
-    },
+    scoreSnapshot: stub('LUMAprotXb1GKqQZqXL9WK6M4VuJRwNVEWmQDiZQaP3s', 78, 72, 84, 91, 70, 75),
   },
   {
     address: 'VELAfi8xuWHaA4ik3sBqBhKxTUJVQBLqgTEdZMb3aJkS',
@@ -149,15 +140,7 @@ export const MOCK_NEW_TOKENS: NewToken[] = [
     chain: 'solana',
     age: 210,
     initialLiquidity: 5_000,
-    scoreSnapshot: {
-      address: 'VELAfi8xuWHaA4ik3sBqBhKxTUJVQBLqgTEdZMb3aJkS',
-      overall: 22,
-      risk: 18,
-      opportunity: 26,
-      momentum: 14,
-      liquidity: 20,
-      labels: ['high-risk', 'low-liquidity', 'low-holders'],
-    },
+    scoreSnapshot: stub('VELAfi8xuWHaA4ik3sBqBhKxTUJVQBLqgTEdZMb3aJkS', 22, 18, 26, 14, 20, 25),
   },
 ];
 
