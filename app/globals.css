@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* ─── Space (dark background scale) ───────────────────────────────────── */
+  --color-space-950: #03060e;
+  --color-space-900: #060c16;
+  --color-space-850: #080f1c;
+  --color-space-800: #0b1422;
+  --color-space-750: #0d1828;
+  --color-space-700: #111e30;
+  --color-space-600: #172640;
+  --color-space-500: #1e3055;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* ─── Accent (cyan) ────────────────────────────────────────────────────── */
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+  --color-accent-600: #0891b2;
+  --color-accent-700: #0e7490;
+
+  /* ─── Success (green) ──────────────────────────────────────────────────── */
+  --color-success-400: #4ade80;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+
+  /* ─── Danger (red) ─────────────────────────────────────────────────────── */
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+
+  /* ─── Warning (amber) ──────────────────────────────────────────────────── */
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+
+  /* ─── Typography ───────────────────────────────────────────────────────── */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: dark;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Custom scrollbar ────────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e3055 transparent;
 }
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #1e3055;
+  border-radius: 4px;
+}
+
+/* ─── Glow utilities ──────────────────────────────────────────────────────── */
+.glow-cyan  { box-shadow: 0 0 20px -6px rgba(6, 182, 212, 0.5); }
+.glow-green { box-shadow: 0 0 20px -6px rgba(34, 197, 94, 0.5); }
+.glow-red   { box-shadow: 0 0 20px -6px rgba(239, 68, 68, 0.5); }
+

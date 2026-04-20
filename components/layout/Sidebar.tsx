@@ -1,0 +1,96 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  Radar,
+  TrendingUp,
+  BarChart3,
+  Settings,
+  Zap,
+  Activity,
+} from 'lucide-react';
+import { APP_NAME, NAV_LINKS } from '@/lib/constants';
+
+// ─── Icon map ─────────────────────────────────────────────────────────────────
+
+const ICON_MAP = {
+  grid: LayoutDashboard,
+  radar: Radar,
+  'trending-up': TrendingUp,
+  'bar-chart': BarChart3,
+  settings: Settings,
+} as const;
+
+type IconKey = keyof typeof ICON_MAP;
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export default function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-space-900 border-r border-space-600">
+
+      {/* ── Logo ─────────────────────────────────────────────────────────── */}
+      <div className="flex h-16 items-center gap-3 border-b border-space-600 px-5">
+        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-accent-500 shadow-[0_0_16px_-4px_rgba(6,182,212,0.7)]">
+          <Zap className="h-4 w-4 text-white" fill="white" />
+        </div>
+        <div className="leading-tight">
+          <p className="text-sm font-bold tracking-tight text-white">{APP_NAME}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent-400">
+            Analytics
+          </p>
+        </div>
+      </div>
+
+      {/* ── Navigation ───────────────────────────────────────────────────── */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-600">
+          Menu
+        </p>
+        <ul className="space-y-0.5">
+          {NAV_LINKS.map((link) => {
+            const Icon = ICON_MAP[link.icon as IconKey];
+            const isActive = pathname === link.href;
+
+            return (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className={[
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                    isActive
+                      ? 'border border-accent-500/20 bg-accent-500/10 text-accent-400'
+                      : 'text-slate-400 hover:bg-space-700 hover:text-slate-100',
+                  ].join(' ')}
+                >
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="flex-1">{link.label}</span>
+                  {isActive && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* ── Status footer ────────────────────────────────────────────────── */}
+      <div className="border-t border-space-600 px-4 py-4 space-y-2">
+        <div className="flex items-center gap-2 rounded-lg bg-space-800 px-3 py-2">
+          <Activity className="h-3.5 w-3.5 text-success-400" />
+          <span className="text-xs text-slate-400">Live Data Feed</span>
+          <span className="ml-auto animate-pulse text-xs text-success-400">●</span>
+        </div>
+        <p className="px-3 text-[10px] text-slate-600">
+          Powered by{' '}
+          <span className="font-medium text-slate-500">Birdeye API</span>
+        </p>
+      </div>
+    </aside>
+  );
+}
