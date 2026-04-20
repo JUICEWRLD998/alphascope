@@ -6,7 +6,7 @@ import { Search, Bell, ChevronDown, Circle } from 'lucide-react';
 import { SUPPORTED_CHAINS } from '@/lib/constants';
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
-  '/':          { title: 'Dashboard',    subtitle: 'Overview of all onchain signals' },
+  '/dashboard': { title: 'Dashboard',    subtitle: 'Overview of all onchain signals' },
   '/radar':     { title: 'Token Radar',  subtitle: 'Newly launched tokens in real time' },
   '/trending':  { title: 'Trending',     subtitle: 'Volume & momentum breakouts' },
   '/scores':    { title: 'Score Board',  subtitle: 'AI-powered risk & opportunity scores' },

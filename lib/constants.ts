@@ -12,7 +12,7 @@ export const SUPPORTED_CHAINS = [
 ] as const;
 
 export const NAV_LINKS = [
-  { href: '/', label: 'Dashboard', icon: 'grid' },
+  { href: '/dashboard', label: 'Dashboard', icon: 'grid' },
   { href: '/radar', label: 'Token Radar', icon: 'radar' },
   { href: '/trending', label: 'Trending', icon: 'trending-up' },
   { href: '/scores', label: 'Score Board', icon: 'bar-chart' },
