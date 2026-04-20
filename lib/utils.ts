@@ -21,7 +21,8 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
-export function formatNumber(value: number): string {
+export function formatNumber(value: number | null | undefined): string {
+  if (value === null || value === undefined || isNaN(value as number)) return '—';
   const abs = Math.abs(value);
   if (abs >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
   if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
@@ -29,7 +30,8 @@ export function formatNumber(value: number): string {
   return value.toFixed(2);
 }
 
-export function formatPercent(value: number, showSign = true): string {
+export function formatPercent(value: number | null | undefined, showSign = true): string {
+  if (value === null || value === undefined || isNaN(value as number)) return '—';
   const sign = showSign && value > 0 ? '+' : '';
   return `${sign}${value.toFixed(2)}%`;
 }

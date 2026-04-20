@@ -42,6 +42,7 @@ export default function Header() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search token or address…"
             className="peer w-full rounded-lg border border-space-600 bg-space-800/70 py-2 pl-9 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-accent-500/50 focus:bg-space-750 focus:outline-none focus:ring-1 focus:ring-accent-500/20 transition-all duration-150"
+            suppressHydrationWarning
           />
         </div>
       </div>
@@ -55,6 +56,7 @@ export default function Header() {
             value={chain}
             onChange={(e) => setChain(e.target.value)}
             className="appearance-none cursor-pointer rounded-lg border border-space-600 bg-space-800 py-2 pl-3 pr-7 text-sm text-slate-200 focus:outline-none focus:border-accent-500/60 transition-colors"
+            suppressHydrationWarning
           >
             {SUPPORTED_CHAINS.map((c) => (
               <option key={c.id} value={c.id}>

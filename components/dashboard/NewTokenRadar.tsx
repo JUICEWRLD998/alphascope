@@ -229,14 +229,36 @@ export function NewTokenRadarSkeleton() {
 
 // ─── Error panel ──────────────────────────────────────────────────────────────
 
+function parseErrorCode(message: string): string {
+  const match = message.match(/^\[([A-Z_]+)\]/);
+  return match ? match[1] : 'UNKNOWN';
+}
+
 function ErrorPanel({ message }: { message: string }) {
+  const code = parseErrorCode(message);
+  const isRateLimited = code === 'RATE_LIMITED';
+
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-danger-500/20 bg-danger-500/5 p-10 text-center">
-      <AlertTriangle className="h-8 w-8 text-danger-400" />
-      <p className="text-sm font-semibold text-danger-300">Failed to load new tokens</p>
-      <p className="font-mono text-xs text-slate-500">{message}</p>
-      <p className="text-xs text-slate-600">
-        Data refreshes automatically on the next request.
+    <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-space-600 bg-space-850/60 p-10 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-space-700">
+        {isRateLimited ? (
+          <BarChart2 className="h-6 w-6 text-warning-400" />
+        ) : (
+          <AlertTriangle className="h-6 w-6 text-slate-400" />
+        )}
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-sm font-semibold text-slate-300">
+          {isRateLimited ? 'Rate limit reached' : 'Data temporarily unavailable'}
+        </p>
+        <p className="text-xs text-slate-500">
+          {isRateLimited
+            ? 'Too many requests. New token data will resume shortly.'
+            : 'Unable to reach the market data provider. This is usually transient — the feed will recover automatically.'}
+        </p>
+      </div>
+      <p className="rounded-full border border-space-600 bg-space-700 px-3 py-1 text-xs text-slate-500">
+        Auto-refreshes on next visit
       </p>
     </div>
   );

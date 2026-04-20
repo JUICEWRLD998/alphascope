@@ -266,12 +266,20 @@ async function TokenList({ chain }: { chain: string }) {
   const result = await getTrendingTokens({ chain, limit: 20 });
 
   if (!result.success || !result.data) {
+    const code = (result.error ?? '').match(/^\[([A-Z_]+)\]/)?.[1] ?? '';
+    const isRateLimited = code === 'RATE_LIMITED';
     return (
-      <div className="flex flex-col items-center gap-2 py-10 text-center">
-        <AlertTriangle className="h-6 w-6 text-danger-400" />
-        <p className="text-sm text-slate-500">Failed to load trending tokens</p>
-        <p className="font-mono text-xs text-slate-600">
-          {result.error ?? 'Unknown error'}
+      <div className="flex flex-col items-center gap-3 py-10 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-space-700">
+          <AlertTriangle className="h-5 w-5 text-slate-400" />
+        </div>
+        <p className="text-sm font-semibold text-slate-300">
+          {isRateLimited ? 'Rate limit reached' : 'Data temporarily unavailable'}
+        </p>
+        <p className="max-w-[200px] text-xs text-slate-500">
+          {isRateLimited
+            ? 'Trending data will resume shortly.'
+            : 'Market data is momentarily unreachable. Refreshing will retry.'}
         </p>
       </div>
     );
