@@ -4,6 +4,8 @@ import { scoreToken } from '@/lib/scoring';
 import type { AppNotification } from '@/lib/notifications';
 import type { BirdeyeNewListing } from '@/lib/types';
 import type { ScoringInput } from '@/lib/scoring';
+import { sendTelegramAlerts } from '@/services/telegram';
+import { filterUnsent } from '@/lib/alert-dedup';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -121,8 +123,46 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // ── 3. Telegram dispatch (non-blocking, high-signal only) ────────────────
+  //
+  // Only fire when env vars are configured. We filter to high-conviction events
+  // (large price moves or strong BUY scores) and deduplicate so the same event
+  // is never sent twice within a server process lifetime.
+  void dispatchToTelegram(notifications);
+
   return NextResponse.json(
     { notifications },
     { headers: { 'Cache-Control': 'no-store' } },
   );
+}
+
+// ─── Telegram dispatcher ──────────────────────────────────────────────────────
+
+/**
+ * High-signal filter thresholds for Telegram.
+ * Higher bar than in-app so the Telegram chat stays low-noise.
+ */
+const TG_PRICE_THRESHOLD   = 15;   // |priceChange| %
+const TG_SCORE_THRESHOLD   = 70;   // opportunity score
+
+async function dispatchToTelegram(notifications: AppNotification[]): Promise<void> {
+  // Skip entirely when Telegram is not configured
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return;
+
+  // Filter to high-signal only
+  const highSignal = notifications.filter((n) => {
+    if (n.type === 'price-alert') {
+      return Math.abs(n.priceChange ?? 0) >= TG_PRICE_THRESHOLD;
+    }
+    if (n.type === 'new-opportunity') {
+      return (n.overallScore ?? 0) >= TG_SCORE_THRESHOLD;
+    }
+    return false;
+  });
+
+  // Deduplicate — only send IDs not yet dispatched in this server process
+  const toSend = filterUnsent(highSignal);
+  if (toSend.length === 0) return;
+
+  await sendTelegramAlerts(toSend);
 }
