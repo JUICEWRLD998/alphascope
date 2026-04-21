@@ -25,6 +25,7 @@ import type {
   BirdeyeNewListing,
   BirdeyeNewListingResponse,
   BirdeyeTokenSecurity,
+  BirdeyeOHLCVResponse,
 } from '@/lib/types';
 import { BIRDEYE_BASE_URL } from '@/lib/constants';
 
@@ -487,6 +488,80 @@ import { revalidateTag } from 'next/cache';
 export function invalidateToken(address: string): void {
   revalidateTag(`token-${address}`, 'default');
   revalidateTag(`token-security-${address}`, 'default');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OHLCV candlestick data
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type OHLCVTimeframe = '1m' | '3m' | '5m' | '15m' | '30m' | '1H' | '2H' | '4H' | '6H' | '8H' | '12H' | '1D' | '3D' | '1W' | '1M';
+
+export interface GetOHLCVOptions {
+  chain?: string;
+  timeframe?: OHLCVTimeframe;
+  /** Number of candles to fetch (max 1000) */
+  limit?: number;
+}
+
+/**
+ * Fetch OHLCV candlestick data for a token.
+ * Endpoint: /defi/ohlcv
+ * Cache: 60 s for intraday, 5 min for daily+
+ */
+export async function getTokenOHLCV(
+  address: string,
+  options: GetOHLCVOptions = {},
+): Promise<ApiResponse<BirdeyeOHLCVResponse>> {
+  const { chain = 'solana', timeframe = '1H', limit = 168 } = options;
+
+  // Use shorter cache for intraday timeframes
+  const isIntraday = ['1m', '3m', '5m', '15m', '30m'].includes(timeframe);
+  const revalidate = isIntraday ? 60 : 300;
+
+  const now = Math.floor(Date.now() / 1000);
+  // Rough time_from: enough history to fill `limit` candles
+  const secondsPerCandle: Record<OHLCVTimeframe, number> = {
+    '1m': 60, '3m': 180, '5m': 300, '15m': 900, '30m': 1800,
+    '1H': 3600, '2H': 7200, '4H': 14400, '6H': 21600, '8H': 28800, '12H': 43200,
+    '1D': 86400, '3D': 259200, '1W': 604800, '1M': 2592000,
+  };
+  const timeFrom = now - secondsPerCandle[timeframe] * Math.min(limit, 1000);
+
+  const result = await birdeyeFetch<{ items: unknown[] }>('/defi/ohlcv', {
+    chain,
+    revalidate,
+    tags: [`ohlcv-${address}-${timeframe}`],
+    params: {
+      address,
+      type: timeframe,
+      time_from: String(timeFrom),
+      time_to: String(now),
+    },
+  });
+
+  if (!result.success || !result.data) {
+    return result as unknown as ApiResponse<BirdeyeOHLCVResponse>;
+  }
+
+  const raw = result.data as unknown as Record<string, unknown>;
+  const items = Array.isArray(raw.items) ? raw.items : [];
+
+  return {
+    success: true,
+    data: {
+      items: items.map((c) => {
+        const candle = c as Record<string, unknown>;
+        return {
+          unixTime: normalizeNumber(candle.unixTime),
+          open:     normalizeNumber(candle.o ?? candle.open),
+          high:     normalizeNumber(candle.h ?? candle.high),
+          low:      normalizeNumber(candle.l ?? candle.low),
+          close:    normalizeNumber(candle.c ?? candle.close),
+          volume:   normalizeNumber(candle.v ?? candle.volume),
+        };
+      }),
+    },
+  };
 }
 
 export function invalidateTrending(chain = 'solana'): void {

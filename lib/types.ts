@@ -179,6 +179,21 @@ export interface BirdeyeNewListingResponse {
   total: number;
 }
 
+/** One OHLCV candle from /defi/ohlcv */
+export interface OHLCVCandle {
+  unixTime: number;  // open timestamp (seconds)
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+/** Top-level response from /defi/ohlcv */
+export interface BirdeyeOHLCVResponse {
+  items: OHLCVCandle[];
+}
+
 /** Returned by /defi/token_security */
 export interface BirdeyeTokenSecurity {
   address: string;

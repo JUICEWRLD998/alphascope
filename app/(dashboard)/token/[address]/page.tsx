@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
+  CandlestickChart,
 } from 'lucide-react';
 import { getTokenOverview } from '@/services/birdeye';
 import { generateInsight, buildInsightInput } from '@/lib/insights';
@@ -32,6 +33,8 @@ import {
   getChangeColor,
   getScoreTextColor,
 } from '@/lib/utils';
+
+import { OHLCVChart } from './_components/ClientCharts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -345,6 +348,17 @@ export default async function TokenDetailPage({ params }: PageProps) {
       {/* ── AI Insight ────────────────────────────────────────────────── */}
       <AnimateIn delay={0.2}>
         <AIPanel insight={insightResult.text} usingAI={insightResult.source === 'gemini'} />
+      </AnimateIn>
+
+      {/* ── OHLCV Chart ──────────────────────────────────────────────────── */}
+      <AnimateIn delay={0.23}>
+      <section>
+        <div className="mb-3 flex items-center gap-2">
+          <CandlestickChart className="h-4 w-4 text-slate-500" />
+          <h2 className="text-sm font-semibold text-slate-100">Price Chart</h2>
+        </div>
+        <OHLCVChart address={address} symbol={token.symbol} />
+      </section>
       </AnimateIn>
 
       {/* ── Score breakdown ──────────────────────────────────────────────── */}
