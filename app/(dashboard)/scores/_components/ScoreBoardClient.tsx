@@ -8,6 +8,7 @@ import { ExternalLink, TrendingUp, ShieldCheck, Zap, RefreshCw, AlertTriangle } 
 import { cn } from '@/lib/utils';
 import { formatPrice, formatNumber, formatPercent, formatAddress, getChangeColor } from '@/lib/utils';
 import ScoreMeter from '@/components/ui/ScoreMeter';
+import CompareButton from '@/components/ui/CompareButton';
 import type { Verdict, ScoreLabel, ScoredEntry } from '@/lib/types';
 
 // ─── Verdict styles ───────────────────────────────────────────────────────────
@@ -116,9 +117,23 @@ function TokenCard({ entry }: { entry: ScoredEntry }) {
           <p className="mt-0.5 font-mono text-[10px] text-slate-600">{formatAddress(entry.address, 4)}</p>
         </div>
 
-        {/* Overall score */}
-        <div className="shrink-0">
+        {/* Overall score + compare */}
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
           <ScoreMeter score={score.overall} size="sm" />
+          <CompareButton token={{
+            address: entry.address,
+            symbol: entry.symbol,
+            name: entry.name,
+            logoURI: entry.logoURI,
+            price: entry.price,
+            overallScore: score.overall,
+            risk: score.risk,
+            opportunity: score.opportunity,
+            momentum: score.momentum,
+            liquidity: score.liquidity,
+            security: score.security,
+            verdict: score.verdict,
+          }} />
         </div>
       </div>
 
@@ -285,6 +300,24 @@ function TableRow({ entry }: { entry: ScoredEntry }) {
             </span>
           )}
         </div>
+      </td>
+
+      {/* Compare */}
+      <td className="px-3 py-3.5">
+        <CompareButton token={{
+          address: entry.address,
+          symbol: entry.symbol,
+          name: entry.name,
+          logoURI: entry.logoURI,
+          price: entry.price,
+          overallScore: score.overall,
+          risk: score.risk,
+          opportunity: score.opportunity,
+          momentum: score.momentum,
+          liquidity: score.liquidity,
+          security: score.security,
+          verdict: score.verdict,
+        }} />
       </td>
     </tr>
   );
@@ -505,6 +538,7 @@ export default function ScoreBoardClient({ entries, fetchError }: { entries: Sco
                     { label: '24h',         align: 'text-right' },
                     { label: 'Volume',      align: 'text-right' },
                     { label: 'Labels',      align: 'text-left' },
+                    { label: 'Compare',     align: 'text-left' },
                   ].map(({ label, align }) => (
                     <th
                       key={label}

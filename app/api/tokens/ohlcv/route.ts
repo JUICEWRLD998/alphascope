@@ -25,6 +25,20 @@ export async function GET(req: NextRequest) {
   const result = await getTokenOHLCV(address, { chain, timeframe });
 
   if (!result.success) {
+    // Birdeye returns success:false or 404 for tokens with no chart history.
+    // Return an empty dataset so the chart renders its "no data" state instead
+    // of a hard 502 error in the browser.
+    const isNoData =
+      result.error?.includes('NOT_FOUND') ||
+      result.error?.includes('success: false') ||
+      result.error?.includes('SERVER_ERROR');
+
+    if (isNoData) {
+      return NextResponse.json({ items: [] }, {
+        headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+      });
+    }
+
     return NextResponse.json({ error: result.error }, { status: 502 });
   }
 
