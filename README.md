@@ -1,36 +1,303 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AlphaScope
 
-## Getting Started
+A **comprehensive Solana token analysis platform** powered by advanced scoring algorithms, real-time market data, and AI-driven insights. AlphaScope provides traders and investors with actionable intelligence to identify high-conviction opportunities and manage risk across the Solana ecosystem.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🎯 Overview
+
+AlphaScope combines on-chain metrics, security analysis, and market momentum indicators into **composite scoring models** that rank tokens across **Risk**, **Opportunity**, **Momentum**, **Liquidity**, and **Security** dimensions. Users can:
+
+- 📊 **Score trending tokens** with AI-generated analysis
+- 🎯 **Track watchlisted tokens** with live scoring updates
+- 📈 **Compare up to 3 tokens** side-by-side with detailed metrics
+- 💹 **View interactive price charts** with multiple timeframes
+- 🔍 **Search and filter** across thousands of Solana tokens
+- ⚡ **Receive security flags** for mutable metadata, freeze authority, LP locks, and Token-2022 risks
+
+---
+
+## ✨ Key Features
+
+### 1. **Token Scoring Engine**
+Composite scoring across five key dimensions:
+- **Risk**: Age, holder count, liquidity floor analysis
+- **Opportunity**: Price momentum, market cap, breakout potential
+- **Momentum**: Volume trends, buy/sell confirmation signals
+- **Liquidity**: On-chain pool depth and DEX availability
+- **Security**: Authority flags, LP burn status, concentration metrics
+
+### 2. **Real-Time Dashboard**
+- New token listings (30m, 1h, 2h, 6h, 24h windows)
+- Trending tokens with live rank updates
+- Interactive scoring dashboard with filters and sorting
+- Verdict badges: **BUY** | **WATCH** | **AVOID**
+
+### 3. **Token Detail Pages**
+- Token overview with price, volume, and market cap
+- AI-powered insights (via Google Gemini)
+- Security analysis and flags
+- Candlestick price charts (15 timeframes: 1m to 1M)
+- Scoring breakdown and signal analysis
+- External links to Solscan, DEX aggregators
+
+### 4. **Watchlist Management**
+- Star/bookmark tokens from any page
+- Persistent local storage
+- Auto-refreshing watchlist with live scores
+- Compare functionality for side-by-side analysis
+
+### 5. **Compare Tool**
+- Select up to 3 tokens
+- View metrics side-by-side
+- Score comparison visualization
+- Risk/opportunity tradeoff analysis
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 19, TypeScript, Tailwind CSS, Framer Motion |
+| **Framework** | Next.js 16 (App Router, Server Components, Turbopack) |
+| **State Management** | React Context API (compare, watchlist) |
+| **Charts** | lightweight-charts 5.1.0 |
+| **Data Source** | Birdeye API (Solana on-chain data) |
+| **AI Insights** | Google Gemini API (fallback to deterministic text) |
+| **Caching** | Next.js ISR with revalidation tags |
+| **Styling** | Custom design system with dark theme |
+
+---
+
+## 📡 Birdeye API Integration
+
+AlphaScope uses the **Birdeye API** to fetch real-time and historical token data. All endpoints are server-side only (API key never exposed to browser).
+
+### Endpoints Used
+
+| Endpoint | Purpose | Cache | Parameters |
+|----------|---------|-------|-----------|
+| **`/defi/v2/tokens/new_listing`** | New token listings | 15s | `sort_by`, `sort_type`, `type`, `limit` |
+| **`/defi/token_trending`** | Top trending tokens | 30s | `sort_by`, `sort_type`, `offset`, `limit` |
+| **`/defi/token_overview`** | Token price & metrics | 60s | `address` |
+| **`/defi/token_security`** | Security flags & analysis | 5m | `address` |
+| **`/defi/ohlcv`** | Candlestick price data | 60s (intraday) / 5m (daily+) | `address`, `type`, `time_from`, `time_to` |
+| **`/defi/v3/search`** | Token search | — | `query`, `chain` |
+
+**Rate Limiting**: 150ms minimum gap between requests (configurable for pro tier)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ (recommended 20 LTS)
+- npm or yarn package manager
+- Birdeye API key ([get one here](https://birdeye.so/api))
+- Google Gemini API key (optional, for AI insights)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/JUICEWRLD998/alphascope.git
+   cd alphascope
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+   Add your API keys to `.env.local`:
+   ```env
+   # Birdeye API (required)
+   BIRDEYE_API_KEY=your_api_key_here
+
+   # Google Gemini API (optional, for AI insights)
+   GEMINI_API_KEY=your_gemini_key_here
+   ```
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 📁 Project Structure
+
+```
+alphascope/
+├── app/
+│   ├── (dashboard)/
+│   │   ├── dashboard/          # Main dashboard
+│   │   ├── radar/              # New token radar
+│   │   ├── trending/           # Trending tokens
+│   │   ├── scores/             # Full scoring board
+│   │   ├── watchlist/          # Saved tokens
+│   │   └── token/[address]/    # Token detail page
+│   ├── api/
+│   │   └── tokens/
+│   │       ├── overview/       # Token price/volume API
+│   │       ├── ohlcv/          # Candlestick chart API
+│   │       ├── security/       # Security flags API
+│   │       ├── trending/       # Trending tokens API
+│   │       ├── new/            # New listings API
+│   │       └── search/         # Token search API
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── ui/                     # Reusable UI components
+│   │   ├── OHLCVChart.tsx
+│   │   ├── CompareButton.tsx
+│   │   ├── WatchlistButton.tsx
+│   │   └── ...
+│   └── dashboard/              # Feature components
+├── lib/
+│   ├── types.ts               # TypeScript definitions
+│   ├── scoring.ts             # Scoring algorithm
+│   ├── compare.tsx            # Compare context
+│   ├── watchlist.ts           # Watchlist store
+│   ├── insights.ts            # AI insights generation
+│   ├── constants.ts
+│   └── utils.ts
+├── services/
+│   ├── birdeye.ts             # Birdeye API wrapper
+│   └── gemini.ts              # Google Gemini integration
+├── public/                     # Static assets
+└── next.config.ts             # Next.js configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🏗️ Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Data Flow
+```
+Browser
+  ↓
+Next.js Route Handler (/api/tokens/*)
+  ↓
+Birdeye Service Layer (services/birdeye.ts)
+  ↓
+Birdeye API
+  ↓
+Next.js ISR Cache (revalidate + tags)
+  ↓
+Browser
+```
 
-## Learn More
+### Scoring Algorithm
+1. **Data Aggregation**: Fetch token metrics (price, volume, holders, liquidity)
+2. **Normalization**: Convert raw metrics to 0-100 scale
+3. **Sub-scoring**: Calculate individual dimension scores
+4. **Composite**: Weight and combine into overall score (0-100)
+5. **Verdict**: Classify as BUY, WATCH, or AVOID
 
-To learn more about Next.js, take a look at the following resources:
+### Caching Strategy
+- **Short-lived (15-60s)**: Trending, new listings (volatile data)
+- **Medium (60s)**: Token overview (price updates)
+- **Long-lived (5m)**: Security, OHLCV (static metadata)
+- **On-demand revalidation**: Via `invalidateTag()` after user actions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎮 Usage
 
-## Deploy on Vercel
+### Explore Tokens
+1. Navigate to **Radar** for newly listed tokens
+2. Browse **Trending** for hot movers
+3. View full **Score Board** for comprehensive analysis
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Find Opportunities
+- Use **filters** (BUY/WATCH/AVOID verdicts)
+- **Sort** by risk, opportunity, or momentum
+- Compare tokens with the **Compare** button (max 3)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Build Your Watchlist
+- **Star** any token to save it
+- View all saved tokens in **Watchlist**
+- Auto-refreshing scores every 30 seconds
+
+### Deep Dive Analysis
+- Click any token to see detailed page
+- Read AI-generated insights
+- View security flags and risks
+- Analyze price chart with multiple timeframes
+
+---
+
+## 🔒 Security
+
+- **API keys**: Never exposed to browser (server-side only)
+- **Environment variables**: Stored in `.env.local` (never committed)
+- **Rate limiting**: Built-in protection against API quota exhaustion
+- **Input validation**: All user inputs sanitized and typed
+- **CORS**: Properly configured for production
+
+---
+
+## 📊 Performance Optimizations
+
+- **Next.js ISR**: Incremental Static Regeneration reduces API calls
+- **Server Components**: Heavy lifting on the server, light client payloads
+- **Code splitting**: Dynamic imports for large components (charts)
+- **Image optimization**: Next.js Image component with lazy loading
+- **Bundle analysis**: ESLint + TypeScript strict mode
+
+---
+
+## 🚢 Deployment
+
+### Deploy on Vercel
+1. Push to GitHub
+2. Connect repo to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
+
+```bash
+vercel deploy
+```
+
+### Deploy on Other Platforms
+```bash
+npm run build
+npm run start
+```
+
+---
+
+## 📝 License
+
+This project is open-source and available under the MIT License.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📧 Support
+
+For issues, questions, or feature requests, please open an issue on GitHub.
+
+---
+
+**Built with ❤️ for the Solana community**
