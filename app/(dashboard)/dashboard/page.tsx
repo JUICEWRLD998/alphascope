@@ -33,11 +33,18 @@ function isBreakout(t: BirdeyeTrendingToken): boolean {
   return (t.v24hChangePercent ?? 0) > 100 || (t.priceChange24hPercent ?? 0) > 50;
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>;
+}) {
+  const params = await searchParams;
+  const chain = params.chain ?? 'solana';
+
   // Fetch both in parallel; errors are safe (API returns typed failure objects)
   const [newListRes, trendRes] = await Promise.all([
-    getNewListings({ chain: 'solana', window: '24h', limit: 50 }),
-    getTrendingTokens({ chain: 'solana', limit: 20 }),
+    getNewListings({ chain, window: '24h', limit: 50 }),
+    getTrendingTokens({ chain, limit: 20 }),
   ]);
 
   // New Tokens (24h)
@@ -144,10 +151,10 @@ export default async function DashboardPage() {
       <AnimateIn delay={0.15}>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
           <div className="lg:col-span-3">
-            <NewTokenRadar />
+            <NewTokenRadar chain={chain} />
           </div>
           <div className="lg:col-span-2">
-            <TrendingBreakout />
+            <TrendingBreakout chain={chain} />
           </div>
         </div>
       </AnimateIn>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, BarChart2, Shield, Zap, TrendingUp, Activity, Eye, Brain } from 'lucide-react';
+import { ArrowRight, BarChart2, Shield, Zap, TrendingUp, Activity, Eye, Brain, Star } from 'lucide-react';
 
 // ─── Animation variants ───────────────────────────────────────────────────────
 
@@ -347,10 +347,15 @@ export default function LandingPage() {
                   <div className="h-6 w-6 rounded-md bg-cyan-500/20" />
                   <div className="h-2 w-16 rounded-full bg-slate-700" />
                 </div>
-                {['Dashboard', 'Token Radar', 'Trending', 'Score Board'].map((item) => (
+                {['Dashboard', 'Token Radar', 'Trending', 'Score Board', 'Watchlist'].map((item) => (
                   <div key={item} className={`mb-1 flex items-center gap-2 rounded-lg px-2 py-1.5 ${item === 'Dashboard' ? 'bg-cyan-500/10' : ''}`}>
-                    <div className="h-1.5 w-1.5 rounded-full bg-slate-700" />
-                    <span className={`text-[10px] ${item === 'Dashboard' ? 'text-cyan-400' : 'text-slate-600'}`}>{item}</span>
+                    {item === 'Watchlist'
+                      ? <Star className="h-2 w-2 fill-amber-400 text-amber-400" />
+                      : <div className="h-1.5 w-1.5 rounded-full bg-slate-700" />}
+                    <span className={`text-[10px] ${item === 'Dashboard' ? 'text-cyan-400' : item === 'Watchlist' ? 'text-amber-400' : 'text-slate-600'}`}>{item}</span>
+                    {item === 'Watchlist' && (
+                      <span className="ml-auto rounded-full bg-amber-500/15 px-1 text-[7px] font-bold text-amber-400">3</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -393,17 +398,20 @@ export default function LandingPage() {
                     </div>
                     <div className="space-y-2">
                       {[
-                        { name: 'PEPE2048',  price: '$0.000042', verdict: 'BUY'   as const },
-                        { name: 'SOLPUNK',   price: '$0.0218',   verdict: 'WATCH' as const },
-                        { name: 'MOONCAT3',  price: '$0.00091',  verdict: 'BUY'   as const },
-                        { name: 'SCAMCOIN',  price: '$0.000001', verdict: 'AVOID' as const },
+                        { name: 'PEPE2048',  price: '$0.000042', verdict: 'BUY'   as const, starred: true  },
+                        { name: 'SOLPUNK',   price: '$0.0218',   verdict: 'WATCH' as const, starred: false },
+                        { name: 'MOONCAT3',  price: '$0.00091',  verdict: 'BUY'   as const, starred: true  },
+                        { name: 'SCAMCOIN',  price: '$0.000001', verdict: 'AVOID' as const, starred: false },
                       ].map((t) => (
-                        <div key={t.name} className="flex items-center justify-between">
-                          <div>
+                        <div key={t.name} className="flex items-center justify-between gap-1">
+                          <div className="min-w-0">
                             <div className="text-[9px] font-semibold text-slate-300">{t.name}</div>
                             <div className="font-mono text-[9px] text-slate-600">{t.price}</div>
                           </div>
-                          <MockVerdictBadge verdict={t.verdict} />
+                          <div className="flex items-center gap-1 shrink-0">
+                            <MockVerdictBadge verdict={t.verdict} />
+                            <Star className={`h-2.5 w-2.5 ${t.starred ? 'fill-amber-400 text-amber-400' : 'text-slate-700'}`} />
+                          </div>
                         </div>
                       ))}
                     </div>

@@ -234,10 +234,23 @@ function SearchBox({ chain }: { chain: string }) {
 
 export default function Header({ onMenuToggle }: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [chain, setChain] = useState('solana');
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  // Sync chain selector with the current URL search param on mount
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const c = params.get('chain');
+    if (c) setChain(c);
+  }, []);
+
+  function handleChainChange(value: string) {
+    setChain(value);
+    router.push(`${pathname}?chain=${value}`);
+  }
 
   const page = PAGE_TITLES[pathname] ?? { title: 'AlphaScope', subtitle: 'Token Analytics' };
 
@@ -270,7 +283,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
         <div className="relative hidden sm:block">
           <select
             value={chain}
-            onChange={(e) => setChain(e.target.value)}
+            onChange={(e) => handleChainChange(e.target.value)}
             className="appearance-none cursor-pointer rounded-lg border border-space-600 bg-space-800 py-2 pl-3 pr-7 text-sm text-slate-200 focus:outline-none focus:border-accent-500/60 transition-colors"
             suppressHydrationWarning
           >

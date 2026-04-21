@@ -146,12 +146,12 @@ function buildRuleBasedReply(message: string, ctx?: ChatRequest['context']): str
   }
 
   if (lower.includes('what') && lower.includes('alphascope')) {
-    return 'AlphaScope is a real-time on-chain analytics platform for Solana tokens. It scores every token across 5 dimensions: Risk, Opportunity, Momentum, Liquidity, and Security — then generates a BUY / WATCH / AVOID verdict.';
+    return `AlphaScope is a real-time on-chain analytics platform for Solana tokens. It scores every token across 5 dimensions: Risk, Opportunity, Momentum, Liquidity, and Security — then generates a BUY / WATCH / AVOID verdict.`;
   }
 
   if (lower.includes('score') || lower.includes('how') && lower.includes('work')) {
-    return 'AlphaScope scores tokens 0–100 across 5 dimensions: Risk (safety), Opportunity (upside potential), Momentum (price/volume trend), Liquidity (pool depth), and Security (on-chain flags). The composite Overall score weights Risk at 30%, Opportunity 25%, Momentum 20%, Liquidity 15%, Security 10%.';
+    return `AlphaScope scores tokens 0–100 across 5 dimensions: Risk (safety), Opportunity (upside potential), Momentum (price/volume trend), Liquidity (pool depth), and Security (on-chain flags). The composite Overall score weights Risk at 30%, Opportunity 25%, Momentum 20%, Liquidity 15%, Security 10%.`;
   }
 
-  return 'I'm AlphaScope AI. Open any token detail page and I can analyze its scores, signals, liquidity, and risk profile in real time. What would you like to know?';
+  return `I'm AlphaScope AI. Open any token detail page and I can analyze its scores, signals, liquidity, and risk profile in real time. What would you like to know?`;
 }

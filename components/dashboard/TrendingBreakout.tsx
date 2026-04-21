@@ -160,7 +160,7 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
   return (
     <li
       className={cn(
-        'relative',
+        'group/row relative',
         breakout.isBreakout && 'after:absolute after:inset-y-0 after:left-0 after:w-0.5 after:rounded-full',
         breakout.isBreakout && score_to_glow_bar(breakout.score),
       )}
@@ -168,7 +168,7 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
       <Link
         href={`/token/${token.address}`}
         className={cn(
-          'flex items-center gap-3 px-4 py-3 transition-all duration-150 group',
+          'flex items-center gap-3 px-4 py-3 pr-10 transition-all duration-150 group',
           breakout.isBreakout
             ? 'hover:bg-accent-500/8'
             : 'hover:bg-space-850/80',
@@ -239,8 +239,8 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
         </div>
       </Link>
 
-      {/* Watchlist button — outside the link to avoid nested interactivity */}
-      <div className="absolute right-3 top-3">
+      {/* Watchlist button — outside link, vertically centred on the row height */}
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-40 transition-opacity group-hover/row:opacity-100">
         <WatchlistButton address={token.address} />
       </div>
 
