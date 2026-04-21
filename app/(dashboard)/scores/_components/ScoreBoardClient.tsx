@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ExternalLink, TrendingUp, ShieldCheck, Zap, RefreshCw } from 'lucide-react';
+import { ExternalLink, TrendingUp, ShieldCheck, Zap, RefreshCw, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice, formatNumber, formatPercent, formatAddress, getChangeColor } from '@/lib/utils';
 import ScoreMeter from '@/components/ui/ScoreMeter';
@@ -320,7 +320,7 @@ type FilterKey = 'ALL' | Verdict;
 
 // ─── Main client component ────────────────────────────────────────────────────
 
-export default function ScoreBoardClient({ entries }: { entries: ScoredEntry[] }) {
+export default function ScoreBoardClient({ entries, fetchError }: { entries: ScoredEntry[]; fetchError?: string }) {
   const [filter, setFilter] = useState<FilterKey>('ALL');
   const [sort, setSort] = useState<SortKey>('overall');
 
@@ -352,6 +352,18 @@ export default function ScoreBoardClient({ entries }: { entries: ScoredEntry[] }
 
   return (
     <div className="space-y-6">
+
+      {/* ── API error banner ───────────────────────────────────────────────────── */}
+      {fetchError && (
+        <div className="flex items-start gap-3 rounded-xl border border-danger-500/30 bg-danger-500/10 px-4 py-3 text-sm text-danger-300">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger-400" />
+          <div>
+            <p className="font-semibold text-danger-300">Failed to load token scores</p>
+            <p className="mt-0.5 text-xs text-danger-400/70">{fetchError}</p>
+            <p className="mt-1 text-xs text-slate-500">This is usually a Birdeye API rate-limit or key issue. The page auto-refreshes every 30 s.</p>
+          </div>
+        </div>
+      )}
 
       {/* ── Page header ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
@@ -443,8 +455,17 @@ export default function ScoreBoardClient({ entries }: { entries: ScoredEntry[] }
             <ShieldCheck className="h-6 w-6 text-slate-600" />
           </div>
           <div>
-            <p className="font-semibold text-slate-300">No tokens match this filter</p>
-            <p className="mt-1 text-sm text-slate-600">Try selecting a different verdict category.</p>
+            {fetchError ? (
+              <>
+                <p className="font-semibold text-slate-300">Scores unavailable</p>
+                <p className="mt-1 text-sm text-slate-600">The trending data fetch failed. Try refreshing the page.</p>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold text-slate-300">No tokens match this filter</p>
+                <p className="mt-1 text-sm text-slate-600">Try selecting a different verdict category.</p>
+              </>
+            )}
           </div>
         </div>
       )}

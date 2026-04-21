@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash-lite',
       systemInstruction: SYSTEM_PROMPT + contextBlock,
     });
 
@@ -105,9 +105,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ reply, source: 'gemini' });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'AI error';
+    const errMessage = err instanceof Error ? err.message : 'AI error';
+    console.error('[chat/route] Gemini error, falling back to rule-based:', errMessage);
     return NextResponse.json(
-      { reply: buildRuleBasedReply(sanitizedMessage, context), source: 'rule-based', warning: message },
+      { reply: buildRuleBasedReply(sanitizedMessage, context), source: 'rule-based', warning: errMessage },
     );
   }
 }
