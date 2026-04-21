@@ -7,6 +7,7 @@ import {
   Radar,
   TrendingUp,
   BarChart3,
+  Star,
   X,
   Zap,
   Activity,
@@ -26,6 +27,7 @@ const ICON_MAP = {
   radar: Radar,
   'trending-up': TrendingUp,
   'bar-chart': BarChart3,
+  star: Star,
 } as const;
 
 type IconKey = keyof typeof ICON_MAP;

@@ -16,6 +16,7 @@ export const NAV_LINKS = [
   { href: '/radar', label: 'Token Radar', icon: 'radar' },
   { href: '/trending', label: 'Trending', icon: 'trending-up' },
   { href: '/scores', label: 'Score Board', icon: 'bar-chart' },
+  { href: '/watchlist', label: 'Watchlist', icon: 'star' },
 ] as const;
 
 export const REFRESH_INTERVAL_MS = 30_000;

@@ -1,22 +1,42 @@
 import type { Metadata } from 'next';
-import { BarChart2 } from 'lucide-react';
+import { getTrendingTokens } from '@/services/birdeye';
+import { scoreToken, buildScoringInput } from '@/lib/scoring';
+import type { ScoredEntry, BirdeyeToken, BirdeyeTrendingToken } from '@/lib/types';
+import ScoreBoardClient from './_components/ScoreBoardClient';
 
 export const metadata: Metadata = {
   title: 'Score Board — AlphaScope',
+  description: 'AI-powered composite scores across risk, opportunity, momentum & liquidity for trending Solana tokens.',
 };
 
-export default function ScoresPage() {
-  return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center gap-6 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-space-600 bg-space-800">
-        <BarChart2 className="h-7 w-7 text-slate-500" />
-      </div>
-      <div>
-        <h1 className="text-lg font-semibold text-slate-100">Score Board — Coming Soon</h1>
-        <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
-          Composite risk &amp; opportunity scoring for trending tokens will be available in a future update.
-        </p>
-      </div>
-    </div>
-  );
+export const revalidate = 30;
+
+function toScoredEntry(token: BirdeyeTrendingToken, rank: number): ScoredEntry {
+  // BirdeyeTrendingToken shares all fields used by buildScoringInput
+  const input = buildScoringInput(token as unknown as BirdeyeToken, null);
+  const score = scoreToken(input);
+  return {
+    address: token.address,
+    symbol: token.symbol,
+    name: token.name,
+    logoURI: token.logoURI,
+    price: token.price,
+    priceChange24hPercent: token.priceChange24hPercent,
+    v24hUSD: token.v24hUSD,
+    mc: token.mc,
+    liquidity: token.liquidity,
+    holder: token.holder,
+    rank,
+    score,
+  };
+}
+
+export default async function ScoresPage() {
+  const result = await getTrendingTokens({ chain: 'solana', limit: 30 });
+  const entries: ScoredEntry[] =
+    result.success && result.data?.tokens.length
+      ? result.data.tokens.map((t, i) => toScoredEntry(t, i + 1))
+      : [];
+
+  return <ScoreBoardClient entries={entries} />;
 }

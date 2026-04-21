@@ -19,6 +19,8 @@ import type { BirdeyeNewListing, Verdict } from '@/lib/types';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 import Badge from '@/components/ui/Badge';
 import ScoreMeter from '@/components/ui/ScoreMeter';
+import WatchlistButton from '@/components/ui/WatchlistButton';
+import CompareButton from '@/components/ui/CompareButton';
 import {
   cn,
   formatNumber,
@@ -151,10 +153,27 @@ function TokenCard({
           </div>
         </div>
 
-        {/* Verdict */}
-        <Badge variant={VERDICT_BADGE[score.verdict]} size="md">
-          {score.verdict}
-        </Badge>
+        {/* Verdict + Watchlist + Compare */}
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Badge variant={VERDICT_BADGE[score.verdict]} size="md">
+            {score.verdict}
+          </Badge>
+          <WatchlistButton address={token.address} />
+          <CompareButton token={{
+            address: token.address,
+            symbol: token.symbol,
+            name: token.name,
+            logoURI: token.logoURI,
+            price: token.price,
+            overallScore: score.overall,
+            risk: score.risk,
+            opportunity: score.opportunity,
+            momentum: score.momentum,
+            liquidity: score.liquidity,
+            security: score.security,
+            verdict: score.verdict,
+          }} />
+        </div>
       </div>
 
       {/* ── Liquidity + Source + Age ── */}

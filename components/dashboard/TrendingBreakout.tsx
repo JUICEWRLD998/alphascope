@@ -13,6 +13,7 @@ import { getTrendingTokens } from '@/services/birdeye';
 import type { BirdeyeTrendingToken } from '@/lib/types';
 import { SkeletonRow } from '@/components/ui/Skeleton';
 import Badge from '@/components/ui/Badge';
+import WatchlistButton from '@/components/ui/WatchlistButton';
 import { cn, formatPrice, formatNumber, formatPercent, getChangeColor, toFiniteNumber } from '@/lib/utils';
 
 // ─── Breakout detection ──────────────────────────────────────────────────────
@@ -237,6 +238,11 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
           <BreakoutBar score={breakout.score} />
         </div>
       </Link>
+
+      {/* Watchlist button — outside the link to avoid nested interactivity */}
+      <div className="absolute right-3 top-3">
+        <WatchlistButton address={token.address} />
+      </div>
 
       {/* Signal pills under row for active breakouts */}
       {breakout.isBreakout && breakout.signals.length > 0 && (

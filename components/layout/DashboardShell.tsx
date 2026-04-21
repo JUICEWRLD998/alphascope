@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import ChatPanel from '@/components/ui/ChatPanel';
 
 export default function DashboardShell({
   children,
@@ -42,6 +43,8 @@ export default function DashboardShell({
         <Header onMenuToggle={toggle} />
         <main className="flex-1 overflow-auto p-4 lg:p-6">{children}</main>
       </div>
+      {/* Global AI chat — available on every dashboard page */}
+      <ChatPanel />
     </>
   );
 }
