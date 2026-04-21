@@ -53,6 +53,17 @@ Composite scoring across five key dimensions:
 - Score comparison visualization
 - Risk/opportunity tradeoff analysis
 
+### 6. **Real-Time Telegram Alerts** 🔔
+- **Live market signals** delivered to Telegram
+- **New token opportunities** (scoring ≥ 60)
+- **Trending breakouts** (volume spike > 100% or price spike > 30%)
+- **High-signal filtering** to reduce noise
+- **Duplicate suppression** within process lifetime
+- **Shared broadcast model** — no auth required
+
+Join the AlphaScope alerts channel to receive real-time notifications:
+📲 **[Join Telegram](https://t.me/+1FkYzkxGf80zNTc0)**
+
 ---
 
 ## 🛠️ Tech Stack
@@ -122,7 +133,13 @@ AlphaScope uses the **Birdeye API** to fetch real-time and historical token data
 
    # Google Gemini API (optional, for AI insights)
    GEMINI_API_KEY=your_gemini_key_here
+
+   # Telegram Notifications (optional, for real-time alerts)
+   TELEGRAM_BOT_TOKEN=your_bot_token_here
+   TELEGRAM_CHAT_ID=your_chat_id_here
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
+
 
 4. **Run the development server**
    ```bash
@@ -257,17 +274,57 @@ Browser
 
 ---
 
+## 🔔 Telegram Notifications
+
+AlphaScope sends real-time market alerts to a shared Telegram channel. The notification system is **fully automated, no-auth required**, and uses intelligent filtering to minimize noise.
+
+### Alert Types
+
+| Type | Trigger | Example |
+|------|---------|---------|
+| **New Opportunity** | New token listing with BUY verdict and score ≥ 60 | "🟢 SOL — New Opportunity" |
+| **Trending Breakout** | Token with volume spike ≥ 100% OR price spike ≥ 30% | "⚡ BONK — Breakout (Vol +150% · Price +45%)" |
+
+### Telegram Thresholds
+- **In-app**: All opportunities (score ≥ 60) and breakouts (any spike)
+- **Telegram high-signal**: Opportunities (score ≥ 70) + breakouts (vol ≥ 150% OR price ≥ 50%)
+
+This dual-tier approach keeps in-app comprehensive while keeping Telegram low-noise for the channel.
+
+### How It Works
+1. Browser-based polling (every 60s) or Vercel cron jobs (every 5 minutes)
+2. `/api/notifications` endpoint fetches trending + new tokens from Birdeye
+3. Scores each token and filters to high-signal alerts
+4. Deduplicates using in-process ID tracking to prevent spam
+5. Dispatches qualifying alerts to Telegram (non-blocking, doesn't affect user latency)
+6. Returns in-app notifications immediately
+
+### Join the Channel
+📲 **[AlphaScope Alerts on Telegram](https://t.me/+1FkYzkxGf80zNTc0)**
+
+---
+
 ## 🚢 Deployment
 
-### Deploy on Vercel
+### Deploy on Vercel (Recommended)
 1. Push to GitHub
 2. Connect repo to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+3. Add environment variables in Vercel dashboard (BIRDEYE_API_KEY, GEMINI_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
+4. Create `vercel.json` for real-time Telegram alerts:
+   ```json
+   {
+     "crons": [{
+       "path": "/api/notifications",
+       "schedule": "*/5 * * * *"
+     }]
+   }
+   ```
+5. Deploy:
+   ```bash
+   vercel deploy
+   ```
 
-```bash
-vercel deploy
-```
+This enables **real-time Telegram notifications every 5 minutes** without requiring browser traffic.
 
 ### Deploy on Other Platforms
 ```bash
