@@ -29,16 +29,15 @@ function formatMessage(n: AppNotification): string {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://alphascope.vercel.app';
   const tokenUrl = `${appUrl}/token/${n.address}`;
 
-  if (n.type === 'price-alert') {
-    const up = (n.priceChange ?? 0) > 0;
-    const arrow = up ? '📈' : '📉';
-    const sign = up ? '\\+' : '';
-    const pct = escMd(Math.abs(n.priceChange ?? 0).toFixed(1));
+  if (n.type === 'trending-breakout') {
+    const volPct   = escMd((n.volumeChange ?? 0).toFixed(0));
+    const pricePct = escMd((n.priceChange  ?? 0).toFixed(1));
+    const rank     = n.rank ? ` · Rank \\#${escMd(n.rank)}` : '';
 
     return [
-      `${arrow} *Watchlist Alert — ${escMd(n.symbol)}*`,
+      `⚡ *Trending Breakout — ${escMd(n.symbol)}*`,
       ``,
-      `Price moved ${sign}${pct}% in the last 24h`,
+      `Vol \\+${volPct}% · Price \\+${pricePct}%${rank}`,
       ``,
       `[View token ›](${tokenUrl})`,
     ].join('\n');

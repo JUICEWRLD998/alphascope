@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type NotificationType = 'price-alert' | 'new-opportunity';
+export type NotificationType = 'new-opportunity' | 'trending-breakout';
 
 export interface AppNotification {
   id: string;
@@ -22,6 +22,10 @@ export interface AppNotification {
   verdict?: 'BUY' | 'WATCH' | 'AVOID';
   /** Overall score 0-100 — present on new-opportunity notifications */
   overallScore?: number;
+  /** 24h volume change % — present on trending-breakout notifications */
+  volumeChange?: number;
+  /** DEX rank — present on trending-breakout notifications */
+  rank?: number;
   /** Unix ms timestamp of the event */
   timestamp: number;
 }

@@ -1,25 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTokenOverview, getNewListings } from '@/services/birdeye';
+import { getNewListings, getTrendingTokens } from '@/services/birdeye';
 import { scoreToken } from '@/lib/scoring';
 import type { AppNotification } from '@/lib/notifications';
-import type { BirdeyeNewListing } from '@/lib/types';
+import type { BirdeyeNewListing, BirdeyeTrendingToken } from '@/lib/types';
 import type { ScoringInput } from '@/lib/scoring';
 import { sendTelegramAlerts } from '@/services/telegram';
 import { filterUnsent } from '@/lib/alert-dedup';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
-/** Minimum absolute 24h price change (%) to emit a price-alert notification */
-const PRICE_ALERT_THRESHOLD = 10;
-
 /** Minimum overall score for a new listing to be shown as an opportunity */
 const OPPORTUNITY_MIN_SCORE = 60;
 
-/** Max number of opportunities to return */
+/** Max new-opportunity notifications to return */
 const OPPORTUNITY_LIMIT = 5;
 
-/** Cap watchlist addresses to protect API quota */
-const MAX_WATCHLIST = 10;
+/** Volume change % threshold for a trending breakout (volume doubled) */
+const BREAKOUT_VOLUME_THRESHOLD = 100;
+
+/** Price change % threshold for a trending breakout */
+const BREAKOUT_PRICE_THRESHOLD = 30;
+
+/** Max breakout notifications to return */
+const BREAKOUT_LIMIT = 5;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -39,67 +42,39 @@ function listingToScoringInput(t: BirdeyeNewListing): ScoringInput {
   };
 }
 
+function isBreakout(t: BirdeyeTrendingToken): boolean {
+  return (t.v24hChangePercent ?? 0) > BREAKOUT_VOLUME_THRESHOLD
+    || (t.priceChange24hPercent ?? 0) > BREAKOUT_PRICE_THRESHOLD;
+}
+
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 /**
  * GET /api/notifications
  *
  * Query params:
- *   addresses  — comma-separated watchlist token addresses (optional, max 10)
- *   chain      — chain id, defaults to "solana"
+ *   chain — chain id, defaults to "solana"
  *
  * Returns:
  *   { notifications: AppNotification[] }
  *
- * Combines two sources:
- *   1. Price alerts — watchlist tokens with |priceChange24h| >= 10%
- *   2. New opportunities — new listings (6h) with BUY verdict and score >= 60
+ * Sources:
+ *   1. New opportunities — new listings (6h) with BUY verdict and score >= 60
+ *   2. Trending breakouts — trending tokens with volume or price spike
  */
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const chain = url.searchParams.get('chain') ?? 'solana';
-  const addressesParam = url.searchParams.get('addresses') ?? '';
-  const addresses = addressesParam
-    .split(',')
-    .map((a) => a.trim())
-    .filter(Boolean)
-    .slice(0, MAX_WATCHLIST);
-
   const notifications: AppNotification[] = [];
   const now = Date.now();
 
-  // ── 1. Watchlist price alerts ─────────────────────────────────────────────
-  if (addresses.length > 0) {
-    const overviewResults = await Promise.allSettled(
-      addresses.map((address) => getTokenOverview(address, { chain })),
-    );
+  // Fetch both data sources in parallel
+  const [newRes, trendRes] = await Promise.all([
+    getNewListings({ chain, window: '6h', limit: 30 }),
+    getTrendingTokens({ chain, limit: 20 }),
+  ]);
 
-    for (const result of overviewResults) {
-      if (result.status !== 'fulfilled') continue;
-      const { success, data } = result.value;
-      if (!success || !data) continue;
-
-      const change = data.priceChange24hPercent;
-      if (Math.abs(change) < PRICE_ALERT_THRESHOLD) continue;
-
-      const up = change > 0;
-      notifications.push({
-        // Stable ID per 10-min window so re-polls don't duplicate unread dots
-        id: `price-${data.address}-${Math.floor(now / 600_000)}`,
-        type: 'price-alert',
-        title: `${data.symbol} ${up ? 'surged' : 'dropped'} ${Math.abs(change).toFixed(1)}%`,
-        message: `Watchlist token moved ${up ? '+' : ''}${change.toFixed(1)}% in the last 24h`,
-        address: data.address,
-        symbol: data.symbol,
-        logoURI: data.logoURI,
-        priceChange: change,
-        timestamp: now,
-      });
-    }
-  }
-
-  // ── 2. New token opportunities ─────────────────────────────────────────────
-  const newRes = await getNewListings({ chain, window: '6h', limit: 30 });
+  // ── 1. New token opportunities ────────────────────────────────────────────
   if (newRes.success && newRes.data?.items) {
     const opportunities = newRes.data.items
       .map((t) => ({ token: t, score: scoreToken(listingToScoringInput(t)) }))
@@ -123,6 +98,36 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // ── 2. Trending breakouts ─────────────────────────────────────────────────
+  if (trendRes.success && trendRes.data?.tokens) {
+    const breakouts = trendRes.data.tokens
+      .filter(isBreakout)
+      .slice(0, BREAKOUT_LIMIT);
+
+    for (const token of breakouts) {
+      const volChange   = token.v24hChangePercent ?? 0;
+      const priceChange = token.priceChange24hPercent ?? 0;
+      const signals: string[] = [];
+      if (volChange   > BREAKOUT_VOLUME_THRESHOLD) signals.push(`Vol +${volChange.toFixed(0)}%`);
+      if (priceChange > BREAKOUT_PRICE_THRESHOLD)  signals.push(`Price +${priceChange.toFixed(1)}%`);
+
+      notifications.push({
+        // Stable ID per 30-min window so the same breakout doesn't spam on every poll
+        id: `breakout-${token.address}-${Math.floor(now / 1_800_000)}`,
+        type: 'trending-breakout',
+        title: `${token.symbol} — Breakout`,
+        message: signals.join(' · '),
+        address: token.address,
+        symbol: token.symbol,
+        logoURI: token.logoURI,
+        volumeChange: volChange,
+        priceChange:  priceChange,
+        rank: token.rank,
+        timestamp: now,
+      });
+    }
+  }
+
   // ── 3. Telegram dispatch (non-blocking, high-signal only) ────────────────
   //
   // Only fire when env vars are configured. We filter to high-conviction events
@@ -142,20 +147,22 @@ export async function GET(req: NextRequest) {
  * High-signal filter thresholds for Telegram.
  * Higher bar than in-app so the Telegram chat stays low-noise.
  */
-const TG_PRICE_THRESHOLD   = 15;   // |priceChange| %
-const TG_SCORE_THRESHOLD   = 70;   // opportunity score
+const TG_SCORE_THRESHOLD  = 70;   // opportunity min score
+const TG_VOLUME_THRESHOLD = 150;  // breakout min volume change %
+const TG_PRICE_THRESHOLD  = 50;   // breakout min price change %
 
 async function dispatchToTelegram(notifications: AppNotification[]): Promise<void> {
   // Skip entirely when Telegram is not configured
   if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return;
 
-  // Filter to high-signal only
+  // Filter to high-signal only — higher bar than in-app to keep Telegram low-noise
   const highSignal = notifications.filter((n) => {
-    if (n.type === 'price-alert') {
-      return Math.abs(n.priceChange ?? 0) >= TG_PRICE_THRESHOLD;
-    }
     if (n.type === 'new-opportunity') {
       return (n.overallScore ?? 0) >= TG_SCORE_THRESHOLD;
+    }
+    if (n.type === 'trending-breakout') {
+      return (n.volumeChange ?? 0) >= TG_VOLUME_THRESHOLD
+        || (n.priceChange  ?? 0) >= TG_PRICE_THRESHOLD;
     }
     return false;
   });

@@ -2,7 +2,7 @@
  * scripts/test-telegram.mjs
  *
  * Standalone smoke-test for Telegram delivery.
- * Reads credentials from .env.local, sends two test messages (one price-alert
+ * Reads credentials from .env.local, sends two test messages (one trending-breakout
  * and one new-opportunity) to the configured chat, and exits with code 0 on
  * success or 1 on failure.
  *
@@ -62,12 +62,12 @@ function esc(text) {
 
 // ─── Message builders ─────────────────────────────────────────────────────────
 
-function priceAlertMessage() {
+function breakoutMessage() {
   const url = `${APP_URL}/token/${DEMO_ADDRESS}`;
   return [
-    `📈 *Test Alert — ${esc('SOL')}*`,
+    `⚡ *Test Breakout — ${esc('BONK')}*`,
     ``,
-    `Price moved \\+15\\.5% in the last 24h`,
+    `Vol \\+182% · Price \\+45\\.2% · Rank \\#3`,
     ``,
     `[View token ›](${url})`,
   ].join('\n');
@@ -120,7 +120,7 @@ console.log(`    Chat ID   : ${CHAT}`);
 console.log(`    App URL   : ${APP_URL}\n`);
 
 const results = await Promise.all([
-  sendMessage(priceAlertMessage(),   'Price-alert message'),
+  sendMessage(breakoutMessage(),    'Breakout message'),
   sendMessage(opportunityMessage(), 'Opportunity message'),
 ]);
 

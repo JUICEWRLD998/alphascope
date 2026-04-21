@@ -6,13 +6,12 @@ import Link from 'next/link';
 import {
   Bell,
   TrendingUp,
-  AlertTriangle,
+  Zap,
   ArrowRight,
   CheckCheck,
   Loader2,
   Clock,
 } from 'lucide-react';
-import { useWatchlist } from '@/lib/watchlist';
 import { useNotificationStore, type AppNotification } from '@/lib/notifications';
 import { cn, timeAgo } from '@/lib/utils';
 
@@ -38,28 +37,17 @@ export default function NotificationPanel({
   onClose,
   onUnreadChange,
 }: NotificationPanelProps) {
-  const { items, hydrated: watchlistHydrated } = useWatchlist();
   const { markAllRead, isRead } = useNotificationStore();
 
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Keep track of the items addresses in a ref to avoid unnecessary effect deps
-  const addressesRef = useRef<string>('');
   const chainRef = useRef<string>('solana');
 
-  // Build the address param when watchlist hydrates
-  useEffect(() => {
-    if (!watchlistHydrated) return;
-    addressesRef.current = items.map((i) => i.address).join(',');
-  }, [items, watchlistHydrated]);
-
   const fetchNotifications = useCallback(async () => {
-    if (!watchlistHydrated) return;
     setLoading(true);
     try {
       const params = new URLSearchParams({ chain: chainRef.current });
-      if (addressesRef.current) params.set('addresses', addressesRef.current);
       const res = await fetch(`/api/notifications?${params.toString()}`);
       if (!res.ok) return;
       const data = (await res.json()) as { notifications: AppNotification[] };
@@ -69,19 +57,18 @@ export default function NotificationPanel({
     } finally {
       setLoading(false);
     }
-  }, [watchlistHydrated]);
+  }, []);
 
-  // Fetch on hydration
+  // Fetch on mount
   useEffect(() => {
-    if (watchlistHydrated) fetchNotifications();
-  }, [watchlistHydrated, fetchNotifications]);
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   // Poll every 60s
   useEffect(() => {
-    if (!watchlistHydrated) return;
     const timer = setInterval(fetchNotifications, POLL_MS);
     return () => clearInterval(timer);
-  }, [watchlistHydrated, fetchNotifications]);
+  }, [fetchNotifications]);
 
   // Sync the chain selector from the URL on the client
   useEffect(() => {
@@ -104,7 +91,7 @@ export default function NotificationPanel({
   }, [open, notifications, markAllRead]);
 
   // ── Derived lists ────────────────────────────────────────────────────────
-  const priceAlerts = notifications.filter((n) => n.type === 'price-alert');
+  const breakouts     = notifications.filter((n) => n.type === 'trending-breakout');
   const opportunities = notifications.filter((n) => n.type === 'new-opportunity');
   const isEmpty = !loading && notifications.length === 0;
   const isFirstLoad = loading && notifications.length === 0;
@@ -146,16 +133,16 @@ export default function NotificationPanel({
       {/* ── Scrollable content ───────────────────────────────────────────── */}
       <div className="max-h-110 overflow-y-auto divide-y divide-space-700/40">
 
-        {/* Price alerts section */}
-        {priceAlerts.length > 0 && (
+        {/* Trending breakouts section */}
+        {breakouts.length > 0 && (
           <section>
             <div className="sticky top-0 z-10 flex items-center gap-1.5 bg-space-800/80 px-4 py-2 backdrop-blur-sm">
-              <AlertTriangle className="h-3 w-3 text-warning-400" />
+              <Zap className="h-3 w-3 text-warning-400" />
               <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                Watchlist Alerts
+                Trending Breakouts
               </p>
             </div>
-            {priceAlerts.map((n) => (
+            {breakouts.map((n) => (
               <NotificationRow
                 key={n.id}
                 notification={n}
@@ -203,9 +190,7 @@ export default function NotificationPanel({
             <div>
               <p className="text-sm font-medium text-slate-400">All caught up</p>
               <p className="mt-1 max-w-55 text-xs leading-relaxed text-slate-600">
-                {items.length === 0
-                  ? 'Star tokens on Radar or Trending to get price alerts here.'
-                  : 'No significant price moves or new opportunities in the last 6 hours.'}
+                No breakouts or new opportunities detected in the last 6 hours.
               </p>
             </div>
           </div>
@@ -215,7 +200,7 @@ export default function NotificationPanel({
       {/* ── Footer ────────────────────────────────────────────────────────── */}
       <div className="border-t border-space-700/60 bg-space-900 px-4 py-2.5">
         <p className="text-center text-[10px] text-slate-600">
-          Refreshes every 60s · {items.length} token{items.length !== 1 ? 's' : ''} in watchlist
+          Refreshes every 60s · Live market signals
         </p>
       </div>
     </div>
@@ -233,8 +218,8 @@ function NotificationRow({
   unread: boolean;
   onClose: () => void;
 }) {
-  const up = (n.priceChange ?? 0) > 0;
   const isOpportunity = n.type === 'new-opportunity';
+  const isBreakout    = n.type === 'trending-breakout';
 
   return (
     <Link
@@ -281,28 +266,35 @@ function NotificationRow({
 
         {/* Chips row */}
         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-          {/* Price change chip */}
-          {n.priceChange !== undefined && (
-            <span
-              className={cn(
-                'rounded-full px-2 py-0.5 text-[10px] font-bold',
-                up
-                  ? 'bg-success-500/10 text-success-400'
-                  : 'bg-danger-500/10 text-danger-400',
-              )}
-            >
-              {up ? '▲' : '▼'} {Math.abs(n.priceChange).toFixed(1)}%
+          {/* Volume change chip — breakout only */}
+          {isBreakout && n.volumeChange !== undefined && (
+            <span className="rounded-full bg-warning-500/10 px-2 py-0.5 text-[10px] font-bold text-warning-400">
+              Vol +{n.volumeChange.toFixed(0)}%
             </span>
           )}
 
-          {/* Score chip */}
+          {/* Price change chip — breakout only */}
+          {isBreakout && n.priceChange !== undefined && (
+            <span className="rounded-full bg-success-500/10 px-2 py-0.5 text-[10px] font-bold text-success-400">
+              ▲ {n.priceChange.toFixed(1)}%
+            </span>
+          )}
+
+          {/* Rank chip — breakout only */}
+          {isBreakout && n.rank !== undefined && (
+            <span className="rounded-full bg-space-700 px-2 py-0.5 text-[10px] font-bold text-slate-400">
+              #{n.rank}
+            </span>
+          )}
+
+          {/* Score chip — opportunity only */}
           {isOpportunity && n.overallScore !== undefined && (
             <span className="rounded-full bg-accent-500/10 px-2 py-0.5 text-[10px] font-bold text-accent-400">
               Score {n.overallScore}
             </span>
           )}
 
-          {/* Verdict chip */}
+          {/* Verdict chip — opportunity only */}
           {isOpportunity && n.verdict && (
             <span className="rounded-full bg-success-500/10 px-2 py-0.5 text-[10px] font-bold text-success-400">
               {n.verdict}

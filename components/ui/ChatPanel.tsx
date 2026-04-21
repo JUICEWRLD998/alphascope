@@ -1,79 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { MessageCircle, X, Sparkles } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { MessageCircle, X, Sparkles, Bot, ChevronDown, Trash2, Loader2, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-export default function ChatPanel() {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      {/* ── Floating toggle button ──────────────────────────────────────── */}
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-label={open ? 'Close AI chat' : 'Open AI chat'}
-        className={cn(
-          'fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full',
-          'bg-accent-500 shadow-lg shadow-accent-500/30 transition-all duration-200',
-          'hover:bg-accent-400 hover:shadow-accent-500/50 hover:scale-105',
-        )}
-      >
-        {open ? (
-          <X className="h-6 w-6 text-white" />
-        ) : (
-          <MessageCircle className="h-6 w-6 text-white" />
-        )}
-      </button>
-
-      {/* ── Slide-up panel ─────────────────────────────────────────────── */}
-      <div
-        className={cn(
-          'fixed bottom-24 right-6 z-50 w-[min(340px,calc(100vw-3rem))]',
-          'overflow-hidden rounded-2xl border border-space-600 bg-space-900',
-          'shadow-2xl shadow-black/40 ring-1 ring-white/5',
-          'transition-all duration-300 ease-out',
-          open
-            ? 'translate-y-0 opacity-100 pointer-events-auto'
-            : 'translate-y-4 opacity-0 pointer-events-none',
-        )}
-      >
-        {/* Header */}
-        <div className="flex items-center gap-2.5 border-b border-space-700 px-4 py-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-500/20 ring-1 ring-accent-500/30">
-            <Sparkles className="h-4 w-4 text-accent-400" />
-          </div>
-          <p className="flex-1 text-sm font-semibold text-slate-100">Ask AlphaScope</p>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-space-700 hover:text-slate-200"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Coming soon body */}
-        <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-accent-500/30 bg-accent-500/10">
-            <Sparkles className="h-6 w-6 text-accent-400" />
-          </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-500/30 bg-accent-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-accent-400">
-            Coming Soon
-          </span>
-          <div className="space-y-1.5">
-            <p className="font-semibold text-slate-200">AI Insights</p>
-            <p className="text-sm text-slate-500">
-              Token-level analysis powered by Gemini — risk breakdowns, opportunity signals, and real-time on-chain context.
-            </p>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
