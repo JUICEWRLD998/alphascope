@@ -440,6 +440,7 @@ export default function ScoreBoardClient({ entries, fetchError }: { entries: Sco
               key={key}
               type="button"
               onClick={() => setFilter(key)}
+              suppressHydrationWarning
               className={cn(
                 'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-150',
                 filter === key
@@ -467,6 +468,7 @@ export default function ScoreBoardClient({ entries, fetchError }: { entries: Sco
                 key={key}
                 type="button"
                 onClick={() => setSort(key)}
+                suppressHydrationWarning
                 className={cn(
                   'rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all duration-150',
                   sort === key
