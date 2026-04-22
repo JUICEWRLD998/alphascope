@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   },
   description:
     "Professional onchain token analytics. Discover new tokens, spot breakouts, and evaluate risk with real-time Birdeye data.",
+  icons: {
+    icon: "/crosshair-focus.svg",
+    shortcut: "/crosshair-focus.svg",
+    apple: "/crosshair-focus.svg",
+  },
 };
 
 export default function RootLayout({
