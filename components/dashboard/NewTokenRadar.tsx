@@ -308,7 +308,7 @@ function ErrorPanel({ message }: { message: string }) {
 
 // ─── Async data grid ──────────────────────────────────────────────────────────
 
-async function TokenGrid({ chain, window: win }: { chain: string; window: string }) {
+async function TokenGrid({ chain, window: win, limit, columns = 3 }: { chain: string; window: string; limit?: number; columns?: 2 | 3 }) {
   const result = await getNewListings({
     chain,
     window: win as '30m' | '1h' | '2h' | '6h' | '24h',
@@ -335,9 +335,11 @@ async function TokenGrid({ chain, window: win }: { chain: string; window: string
     .map((token) => ({ token, score: scoreToken(listingToScoringInput(token)) }))
     .sort((a, b) => b.score.overall - a.score.overall);
 
+  const displayed = limit ? ranked.slice(0, limit) : ranked;
+
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {ranked.map(({ token }, idx) => (
+    <div className={cn('grid grid-cols-1 gap-4', columns === 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 xl:grid-cols-3')}>
+      {displayed.map(({ token }, idx) => (
         <TokenCard key={token.address} token={token} rank={idx + 1} />
       ))}
     </div>
@@ -347,13 +349,17 @@ async function TokenGrid({ chain, window: win }: { chain: string; window: string
 // ─── Public component ─────────────────────────────────────────────────────────
 
 interface NewTokenRadarProps {
-  chain?:  string;
-  window?: '30m' | '1h' | '2h' | '6h' | '24h';
+  chain?:   string;
+  window?:  '30m' | '1h' | '2h' | '6h' | '24h';
+  limit?:   number;
+  columns?: 2 | 3;
 }
 
 export default function NewTokenRadar({
-  chain  = 'solana',
-  window = '6h',
+  chain   = 'solana',
+  window  = '6h',
+  limit,
+  columns = 3,
 }: NewTokenRadarProps) {
   return (
     <section className="rounded-xl border border-space-700 bg-space-900 p-6">
@@ -373,14 +379,14 @@ export default function NewTokenRadar({
       {/* Streaming card grid */}
       <Suspense
         fallback={
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <div className={cn('grid grid-cols-1 gap-4', columns === 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 xl:grid-cols-3')}>
+            {Array.from({ length: limit ?? 6 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
           </div>
         }
       >
-        <TokenGrid chain={chain} window={window} />
+        <TokenGrid chain={chain} window={window} limit={limit} columns={columns} />
       </Suspense>
 
       {/* Footer link */}

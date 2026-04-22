@@ -151,7 +151,7 @@ export default async function DashboardPage({
       <AnimateIn delay={0.15}>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
           <div className="lg:col-span-3">
-            <NewTokenRadar chain={chain} />
+            <NewTokenRadar chain={chain} limit={10} columns={2} />
           </div>
           <div className="lg:col-span-2">
             <TrendingBreakout chain={chain} />
