@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, BarChart2, Shield, Zap, TrendingUp, Activity, Eye, Brain, Star } from 'lucide-react';
+import { ArrowRight, BarChart2, Shield, Zap, TrendingUp, Activity, Eye, Brain, Star, Crosshair } from 'lucide-react';
 
 // ─── Animation variants ───────────────────────────────────────────────────────
 
@@ -137,8 +137,8 @@ export default function LandingPage() {
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
-              <Activity className="h-4 w-4" />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-linear-to-br from-violet-500 to-emerald-400 shadow-[0_0_12px_-2px_rgba(52,211,153,0.5)]">
+              <Crosshair className="h-4 w-4 text-white" strokeWidth={2} />
             </span>
             <span className="text-sm font-bold tracking-tight text-slate-100">AlphaScope</span>
           </div>
