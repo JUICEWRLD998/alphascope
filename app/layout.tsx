@@ -25,6 +25,27 @@ export const metadata: Metadata = {
     shortcut: "/crosshair-focus.svg",
     apple: "/crosshair-focus.svg",
   },
+  openGraph: {
+    title: "AlphaScope — Crypto Token Analytics",
+    description:
+      "Professional onchain token analytics. Discover new tokens, spot breakouts, and evaluate risk with real-time Birdeye data.",
+    images: [
+      {
+        url: "/alphascope-logo2.png",
+        width: 1200,
+        height: 630,
+        alt: "AlphaScope Logo",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AlphaScope — Crypto Token Analytics",
+    description:
+      "Professional onchain token analytics. Discover new tokens, spot breakouts, and evaluate risk with real-time Birdeye data.",
+    images: ["/alphascope-logo2.png"],
+  },
 };
 
 export default function RootLayout({
