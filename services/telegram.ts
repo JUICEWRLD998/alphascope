@@ -26,7 +26,7 @@ function escMd(text: string | number): string {
 
 /** Format a notification object into a Telegram MarkdownV2 message string */
 function formatMessage(n: AppNotification): string {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://alphascope.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://alphascope-psi.vercel.app';
   const tokenUrl = `${appUrl}/token/${n.address}`;
 
   if (n.type === 'trending-breakout') {

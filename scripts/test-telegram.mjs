@@ -45,7 +45,7 @@ loadEnv(resolve(ROOT, '.env'));
 
 const TOKEN  = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT   = process.env.TELEGRAM_CHAT_ID;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://alphascope.vercel.app';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://alphascope-psi.vercel.app';
 
 if (!TOKEN || !CHAT) {
   console.error('❌  Missing env vars. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env.local');
