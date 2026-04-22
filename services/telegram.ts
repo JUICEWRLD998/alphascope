@@ -43,6 +43,42 @@ function formatMessage(n: AppNotification): string {
     ].join('\n');
   }
 
+  if (n.type === 'price-floor-break') {
+    const drop = escMd(Math.abs(n.priceChange ?? 0).toFixed(1));
+    return [
+      `📉 *Price Floor Break — ${escMd(n.symbol)}*`,
+      ``,
+      `Dropped \\-${drop}% in 24h`,
+      `Potential reversal setup — consider buying the dip`,
+      ``,
+      `[View token ›](${tokenUrl})`,
+    ].join('\n');
+  }
+
+  if (n.type === 'liquidity-milestone') {
+    const milestone = escMd(n.milestoneLabel ?? '');
+    return [
+      `💧 *Liquidity Milestone — ${escMd(n.symbol)}*`,
+      ``,
+      `Liquidity reached *${milestone}*`,
+      `Now highly tradeable — easier to enter and exit positions`,
+      ``,
+      `[View token ›](${tokenUrl})`,
+    ].join('\n');
+  }
+
+  if (n.type === 'security-risk') {
+    const flags = (n.riskFlags ?? []).map((f) => escMd(f)).join(', ');
+    return [
+      `🚨 *Security Risk — ${escMd(n.symbol)}*`,
+      ``,
+      `Risk flags detected: ${flags}`,
+      `Exercise caution — verify before trading`,
+      ``,
+      `[View token ›](${tokenUrl})`,
+    ].join('\n');
+  }
+
   // new-opportunity
   const score = n.overallScore ?? 0;
   const scoreBar = buildScoreBar(score);

@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type NotificationType = 'new-opportunity' | 'trending-breakout';
+export type NotificationType =
+  | 'new-opportunity'
+  | 'trending-breakout'
+  | 'price-floor-break'
+  | 'liquidity-milestone'
+  | 'security-risk';
 
 export interface AppNotification {
   id: string;
@@ -26,6 +31,12 @@ export interface AppNotification {
   volumeChange?: number;
   /** DEX rank — present on trending-breakout notifications */
   rank?: number;
+  /** Current liquidity USD — present on liquidity-milestone notifications */
+  liquidityUSD?: number;
+  /** Milestone label e.g. "$1M" — present on liquidity-milestone notifications */
+  milestoneLabel?: string;
+  /** Risk flag names — present on security-risk notifications */
+  riskFlags?: string[];
   /** Unix ms timestamp of the event */
   timestamp: number;
 }

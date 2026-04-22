@@ -24,6 +24,30 @@ const BREAKOUT_PRICE_THRESHOLD = 30;
 /** Max breakout notifications to return */
 const BREAKOUT_LIMIT = 5;
 
+/** Price drop % threshold to trigger a price-floor-break alert (negative value) */
+const PRICE_DROP_THRESHOLD = -30;
+
+/** Max price-floor-break notifications to return */
+const PRICE_DROP_LIMIT = 3;
+
+/** Liquidity milestones (descending — we pick the highest one a token qualifies for) */
+const LIQUIDITY_MILESTONES = [
+  { threshold: 5_000_000, label: '$5M' },
+  { threshold: 1_000_000, label: '$1M' },
+  { threshold:   500_000, label: '$500K' },
+] as const;
+
+/** Max liquidity-milestone notifications to return */
+const LIQUIDITY_MILESTONE_LIMIT = 5;
+
+/** Labels that trigger a security-risk alert (at least 2 must be present) */
+const SECURITY_RISK_LABELS = [
+  'mintable', 'freezeable', 'honeypot-risk', 'concentrated-supply',
+] as const;
+
+/** Max security-risk notifications to return */
+const SECURITY_RISK_LIMIT = 5;
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function listingToScoringInput(t: BirdeyeNewListing): ScoringInput {
@@ -128,7 +152,85 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ── 3. Telegram dispatch (non-blocking, high-signal only) ────────────────
+  // ── 3. Price floor breaks ─────────────────────────────────────────────────
+  if (trendRes.success && trendRes.data?.tokens) {
+    const drops = trendRes.data.tokens
+      .filter((t) => (t.priceChange24hPercent ?? 0) <= PRICE_DROP_THRESHOLD)
+      .sort((a, b) => a.priceChange24hPercent - b.priceChange24hPercent) // most dropped first
+      .slice(0, PRICE_DROP_LIMIT);
+
+    for (const token of drops) {
+      const drop = Math.abs(token.priceChange24hPercent).toFixed(1);
+      notifications.push({
+        id: `price-drop-${token.address}-${Math.floor(now / 3_600_000)}`, // hourly dedup
+        type: 'price-floor-break',
+        title: `${token.symbol} \u2014 Price Floor Break`,
+        message: `Dropped ${drop}% in 24h \u2014 potential reversal setup`,
+        address: token.address,
+        symbol: token.symbol,
+        logoURI: token.logoURI,
+        priceChange: token.priceChange24hPercent,
+        timestamp: now,
+      });
+    }
+  }
+
+  // ── 4. Liquidity milestones ───────────────────────────────────────────────
+  if (trendRes.success && trendRes.data?.tokens) {
+    let milestoneCount = 0;
+    for (const token of trendRes.data.tokens) {
+      if (milestoneCount >= LIQUIDITY_MILESTONE_LIMIT) break;
+      const liq = token.liquidity ?? 0;
+      const milestone = LIQUIDITY_MILESTONES.find((m) => liq >= m.threshold);
+      if (!milestone) continue;
+
+      notifications.push({
+        id: `liq-milestone-${token.address}-${milestone.label}`, // fires once per process lifetime per milestone
+        type: 'liquidity-milestone',
+        title: `${token.symbol} \u2014 Liquidity Milestone`,
+        message: `Liquidity reached ${milestone.label} \u2014 now highly tradeable`,
+        address: token.address,
+        symbol: token.symbol,
+        logoURI: token.logoURI,
+        liquidityUSD: liq,
+        milestoneLabel: milestone.label,
+        timestamp: now,
+      });
+      milestoneCount++;
+    }
+  }
+
+  // ── 5. Security risks ─────────────────────────────────────────────────────
+  if (newRes.success && newRes.data?.items) {
+    const riskTokens = newRes.data.items
+      .map((t) => ({ token: t, score: scoreToken(listingToScoringInput(t)) }))
+      .filter(({ score }) => {
+        const flagCount = SECURITY_RISK_LABELS.filter((l) =>
+          (score.labels as readonly string[]).includes(l),
+        ).length;
+        return flagCount >= 2; // at least 2 red flags
+      })
+      .slice(0, SECURITY_RISK_LIMIT);
+
+    for (const { token, score } of riskTokens) {
+      const flags = SECURITY_RISK_LABELS.filter((l) =>
+        (score.labels as readonly string[]).includes(l),
+      );
+      notifications.push({
+        id: `security-risk-${token.address}`, // fires once per address per process lifetime
+        type: 'security-risk',
+        title: `${token.symbol} \u2014 Security Risk`,
+        message: `Risk flags: ${flags.join(', ')}`,
+        address: token.address,
+        symbol: token.symbol,
+        logoURI: token.logoURI,
+        riskFlags: [...flags],
+        timestamp: token.liquidityAddedAt * 1000,
+      });
+    }
+  }
+
+  // ── 6. Telegram dispatch (non-blocking, high-signal only) ────────────────
   //
   // Only fire when env vars are configured. We filter to high-conviction events
   // (large price moves or strong BUY scores) and deduplicate so the same event
@@ -164,6 +266,12 @@ async function dispatchToTelegram(notifications: AppNotification[]): Promise<voi
       return (n.volumeChange ?? 0) >= TG_VOLUME_THRESHOLD
         || (n.priceChange  ?? 0) >= TG_PRICE_THRESHOLD;
     }
+    // Always send price floor breaks (significant drops are high signal)
+    if (n.type === 'price-floor-break') return true;
+    // Only send liquidity milestones of $1M or higher to keep channel low-noise
+    if (n.type === 'liquidity-milestone') return (n.liquidityUSD ?? 0) >= 1_000_000;
+    // Always send security risks (critical for avoiding loss)
+    if (n.type === 'security-risk') return true;
     return false;
   });
 
