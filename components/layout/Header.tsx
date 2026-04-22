@@ -147,7 +147,7 @@ function SearchBox({ chain }: { chain: string }) {
   const showDropdown = open && query.trim().length >= 2;
 
   return (
-    <div ref={wrapperRef} className="relative mx-auto hidden w-full max-w-sm md:block">
+    <div ref={wrapperRef} className="relative mx-auto flex-1 min-w-0 max-w-sm">
       <div className="relative">
         {loading ? (
           <Loader2 className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-accent-500" />

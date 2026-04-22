@@ -19,7 +19,6 @@ import type { BirdeyeNewListing, Verdict } from '@/lib/types';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 import Badge from '@/components/ui/Badge';
 import ScoreMeter from '@/components/ui/ScoreMeter';
-import WatchlistButton from '@/components/ui/WatchlistButton';
 import CompareButton from '@/components/ui/CompareButton';
 import {
   cn,
@@ -158,7 +157,6 @@ function TokenCard({
           <Badge variant={VERDICT_BADGE[score.verdict]} size="md">
             {score.verdict}
           </Badge>
-          <WatchlistButton address={token.address} />
           <CompareButton token={{
             address: token.address,
             symbol: token.symbol,
