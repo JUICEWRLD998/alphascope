@@ -100,7 +100,7 @@ export default function NotificationPanel({
     <div
       className={cn(
         'absolute right-0 top-full mt-2 z-50',
-        'w-[min(380px,calc(100vw-2rem))]',
+        'w-[min(320px,calc(100vw-1.5rem))] sm:w-[min(380px,calc(100vw-2rem))]',
         'overflow-hidden rounded-2xl border border-space-600 bg-space-900',
         'shadow-2xl shadow-black/50 ring-1 ring-white/5',
         'transition-all duration-200 ease-out origin-top-right',
