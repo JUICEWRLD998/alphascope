@@ -25,17 +25,16 @@ export default function WatchlistPage() {
     setLoading(true);
     setError(null);
 
-    const controllers: AbortController[] = [];
-
-    Promise.all(
-      items.map(async ({ address }, i) => {
-        const ctrl = new AbortController();
-        controllers.push(ctrl);
+    // Fetch sequentially to respect Birdeye's 150ms rate limit (free tier)
+    (async () => {
+      const results: ScoredEntry[] = [];
+      
+      for (let i = 0; i < items.length; i++) {
+        const { address } = items[i];
         try {
-          const res = await fetch(`/api/tokens/overview?address=${encodeURIComponent(address)}`, {
-            signal: ctrl.signal,
-          });
-          if (!res.ok) return null;
+          const res = await fetch(`/api/tokens/overview?address=${encodeURIComponent(address)}`);
+          if (!res.ok) continue;
+          
           const token = await res.json() as BirdeyeToken;
           const input = buildScoringInput(token, null);
           const score = scoreToken(input);
@@ -53,20 +52,15 @@ export default function WatchlistPage() {
             rank: i + 1,
             score,
           };
-          return entry;
+          results.push(entry);
         } catch {
-          return null;
+          // Skip failed fetches silently
         }
-      }),
-    ).then((results) => {
-      setEntries(results.filter((r): r is ScoredEntry => r !== null));
+      }
+      
+      setEntries(results);
       setLoading(false);
-    }).catch(() => {
-      setError('Failed to load watchlist tokens.');
-      setLoading(false);
-    });
-
-    return () => controllers.forEach((c) => c.abort());
+    })();
   }, [items, hydrated]);
 
   return (
