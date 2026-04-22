@@ -25,6 +25,12 @@ export const metadata: Metadata = {
     shortcut: "/crosshair-focus.svg",
     apple: "/crosshair-focus.svg",
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
 };
 
 export default function RootLayout({
