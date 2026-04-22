@@ -15,6 +15,7 @@ import { TrendingBreakoutSkeleton } from '@/components/dashboard/TrendingBreakou
 import Badge from '@/components/ui/Badge';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 import AnimateIn from '@/components/ui/AnimateIn';
+import WatchlistButton from '@/components/ui/WatchlistButton';
 import {
   cn,
   formatPrice,
@@ -107,8 +108,11 @@ function BreakoutCard({ token, rank }: { token: BirdeyeTrendingToken; rank: numb
         glow,
       )}
     >
-      {/* Rank */}
-      <span className="absolute right-4 top-4 font-mono text-[10px] text-slate-600">#{rank}</span>
+      {/* Rank + watchlist */}
+      <div className="absolute right-4 top-4 flex items-center gap-2">
+        <WatchlistButton address={token.address} />
+        <span className="font-mono text-[10px] text-slate-600">#{rank}</span>
+      </div>
 
       {/* Header */}
       <div className="flex items-start gap-3">
