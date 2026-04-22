@@ -126,17 +126,21 @@ AlphaScope uses the **Birdeye API** to fetch real-time and historical token data
    cp .env.local.example .env.local
    ```
 
-   Add your API keys to `.env.local`:
+   Update `.env.local` with your API keys:
    ```env
-   # Birdeye API (required)
+   # Required: Birdeye API key from https://birdeye.so/api
    BIRDEYE_API_KEY=your_api_key_here
 
-   # Google Gemini API (optional, for AI insights)
+   # Optional: Google Gemini API key from https://aistudio.google.com/app/apikey
+   # If not set, AI insights fall back to deterministic text
    GEMINI_API_KEY=your_gemini_key_here
 
-   # Telegram Notifications (optional, for real-time alerts)
+   # Optional: Telegram notifications for real-time alerts
+   # Get bot token from Telegram's BotFather, chat ID from your group/channel
    TELEGRAM_BOT_TOKEN=your_bot_token_here
    TELEGRAM_CHAT_ID=your_chat_id_here
+
+   # Optional: Public app URL (for Telegram links; defaults to production URL)
    NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
 

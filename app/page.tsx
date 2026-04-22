@@ -100,7 +100,7 @@ function FeatureCard({
 
 function StatPill({ value, label }: { value: string; label: string }) {
   return (
-    <motion.div variants={fadeUp} className="flex flex-col items-center gap-1 px-8">
+    <motion.div variants={fadeUp} className="flex flex-col items-center gap-1">
       <span className="font-mono text-3xl font-bold text-cyan-300 tabular-nums">{value}</span>
       <span className="text-xs text-slate-500">{label}</span>
     </motion.div>
@@ -231,7 +231,7 @@ export default function LandingPage() {
       <section className="relative border-y border-white/4 bg-white/2 py-12">
         <div className="mx-auto max-w-3xl px-6">
           <motion.div
-            className="flex flex-wrap items-center justify-center divide-x divide-white/6"
+            className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8"
             variants={stagger}
             initial="hidden"
             whileInView="show"
