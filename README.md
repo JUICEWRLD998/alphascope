@@ -1,5 +1,4 @@
 # AlphaScope
-n
 A **comprehensive Solana token analysis platform** powered by advanced scoring algorithms, real-time market data, and AI-driven insights. AlphaScope provides traders and investors with actionable intelligence to identify high-conviction opportunities and manage risk across the Solana ecosystem.
 
 ---
