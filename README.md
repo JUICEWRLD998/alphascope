@@ -1,5 +1,5 @@
 # AlphaScope
-
+n
 A **comprehensive Solana token analysis platform** powered by advanced scoring algorithms, real-time market data, and AI-driven insights. AlphaScope provides traders and investors with actionable intelligence to identify high-conviction opportunities and manage risk across the Solana ecosystem.
 
 ---
@@ -12,7 +12,8 @@ AlphaScope combines on-chain metrics, security analysis, and market momentum ind
 - 🎯 **Track watchlisted tokens** with live scoring updates
 - 📈 **Compare up to 3 tokens** side-by-side with detailed metrics
 - 💹 **View interactive price charts** with multiple timeframes
-- 🔍 **Search and filter** across thousands of Solana tokens
+- 🌐 **Multi-chain support** — Analyze tokens across Solana, Ethereum, BSC, and Base
+- 🔍 **Search and filter** across thousands of tokens across all supported chains
 - ⚡ **Receive security flags** for mutable metadata, freeze authority, LP locks, and Token-2022 risks
 
 ---
@@ -102,11 +103,9 @@ AlphaScope uses the **Birdeye API** to fetch real-time and historical token data
 
 ## � Future Roadmap
 
-1. **Multi-Chain Support** — Expand to Ethereum, Base, BSC with unified scoring
-2. **User Accounts & Portfolios** — Track P&L, save custom watchlists across devices
-3. **Advanced Alerts** — Email, Discord, webhooks, custom thresholds
-4. **Strategy Backtesting** — Validate trading rules against historical data
-5. **Mobile PWA** — On-the-go token monitoring with push notifications
+1. **User Accounts & Portfolios** — Track P&L, save custom watchlists across devices
+2. **Advanced Alerts** — Email, Discord, webhooks, custom thresholds
+3. **Strategy Backtesting** — Validate trading rules against historical data
 
 ---
 
