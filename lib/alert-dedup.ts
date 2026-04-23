@@ -1,49 +1,73 @@
 /**
- * lib/alert-dedup.ts — In-process duplicate suppression for Telegram alerts
+ * lib/alert-dedup.ts — Duplicate suppression for Telegram alerts
  *
- * Uses a module-level Set that lives for the lifetime of the Node.js server
- * process. This is sufficient for a single-instance deployment (dev server or
- * Vercel function warm instance) because:
+ * Primary (production): Neon Postgres — persists across server restarts and
+ * cold starts, preventing duplicate Telegram messages even when the cron job
+ * and client polling both fire at the same time.
  *
- *  • Notification IDs are already time-windowed in the notifications route
- *    (e.g. `price-<addr>-<10min-bucket>`) so the same economic event cannot
- *    generate a new ID for at least 10 minutes.
+ * Fallback (dev without DATABASE_URL): In-memory Set — same behaviour as
+ * before, scoped to the current process lifetime.
  *
- *  • The Set is capped at MAX_SENT_IDS entries to prevent memory growth if the
- *    server stays warm for a very long time.
- *
- * Trade-off: on a cold start (new Vercel invocation, server restart) the Set
- * is empty, so a single duplicate send per event window is possible. For a
- * bounty project this is an acceptable trade-off that avoids a database.
+ * The INSERT ... ON CONFLICT DO NOTHING pattern is atomic, so concurrent
+ * invocations can never both return true for the same alert_id.
  */
 
-const MAX_SENT_IDS = 500;
+import { getSql } from './db';
 
-// Module-level singleton — shared across all requests in the same process
-const sentIds = new Set<string>();
+// ─── In-memory fallback (local dev without DATABASE_URL) ──────────────────────
 
-/**
- * Returns true if this notification ID has NOT been sent before and records it
- * as sent. Returns false (skip) if it was already dispatched.
- */
-export function shouldSend(id: string): boolean {
-  if (sentIds.has(id)) return false;
+const MAX_MEMORY_IDS = 500;
+const memorySet = new Set<string>();
 
-  sentIds.add(id);
-
-  // Prune oldest entries when cap is reached
-  if (sentIds.size > MAX_SENT_IDS) {
-    const oldest = [...sentIds].slice(0, sentIds.size - MAX_SENT_IDS);
-    for (const old of oldest) sentIds.delete(old);
+function memoryCheck(id: string): boolean {
+  if (memorySet.has(id)) return false;
+  memorySet.add(id);
+  if (memorySet.size > MAX_MEMORY_IDS) {
+    const oldest = [...memorySet].slice(0, memorySet.size - MAX_MEMORY_IDS);
+    for (const old of oldest) memorySet.delete(old);
   }
-
   return true;
 }
 
+// ─── Public API ───────────────────────────────────────────────────────────────
+
 /**
- * Convenience: filter an array of notifications down to only those that
- * have not yet been dispatched, and mark each returned item as sent.
+ * Returns true if this alert ID has NOT been sent before and atomically
+ * records it as sent. Returns false if it was already dispatched.
+ *
+ * Uses Neon Postgres when DATABASE_URL is set; falls back to in-memory Set.
  */
-export function filterUnsent<T extends { id: string }>(items: T[]): T[] {
-  return items.filter((item) => shouldSend(item.id));
+export async function shouldSend(id: string, type = ''): Promise<boolean> {
+  if (!process.env.DATABASE_URL) return memoryCheck(id);
+
+  try {
+    const sql = getSql();
+    const result = await sql`
+      INSERT INTO sent_alerts (alert_id, type)
+      VALUES (${id}, ${type})
+      ON CONFLICT (alert_id) DO NOTHING
+      RETURNING id
+    `;
+    return result.length > 0;
+  } catch {
+    // If DB is temporarily unavailable, fall back to in-memory to avoid blocking
+    console.warn('[alert-dedup] DB insert failed, using in-memory fallback for:', id);
+    return memoryCheck(id);
+  }
+}
+
+/**
+ * Filters an array of notifications down to only those not yet dispatched,
+ * and atomically marks each returned item as sent.
+ */
+export async function filterUnsent<T extends { id: string; type?: string }>(
+  items: T[],
+): Promise<T[]> {
+  const results: T[] = [];
+  for (const item of items) {
+    if (await shouldSend(item.id, (item as { type?: string }).type ?? '')) {
+      results.push(item);
+    }
+  }
+  return results;
 }

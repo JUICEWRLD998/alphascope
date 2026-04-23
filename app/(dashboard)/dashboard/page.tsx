@@ -149,11 +149,11 @@ export default async function DashboardPage({
 
       {/* ── New Token Radar + Trending Breakouts ──────────────────────── */}
       <AnimateIn delay={0.15}>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
-          <div className="lg:col-span-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="h-full">
             <NewTokenRadar chain={chain} limit={10} columns={2} />
           </div>
-          <div className="lg:col-span-2">
+          <div className="h-full">
             <TrendingBreakout chain={chain} />
           </div>
         </div>

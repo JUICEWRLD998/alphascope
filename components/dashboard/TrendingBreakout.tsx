@@ -244,20 +244,7 @@ function TokenRow({ token }: { token: BirdeyeTrendingToken }) {
         <WatchlistButton address={token.address} />
       </div>
 
-      {/* Signal pills under row for active breakouts */}
-      {breakout.isBreakout && breakout.signals.length > 0 && (
-        <div className="flex gap-1 px-13 pb-2 -mt-1">
-          {breakout.signals.map((sig) => (
-            <span
-              key={sig}
-              className="inline-flex items-center gap-0.5 rounded border border-accent-500/20 bg-accent-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold tracking-wider text-accent-400"
-            >
-              <Zap className="h-2 w-2" />
-              {sig}
-            </span>
-          ))}
-        </div>
-      )}
+
     </li>
   );
 }
@@ -342,7 +329,7 @@ interface TrendingBreakoutProps {
 
 export default function TrendingBreakout({ chain = 'solana' }: TrendingBreakoutProps) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-space-700 bg-space-900">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-space-700 bg-space-900">
 
       {/* Header */}
       <div className="flex items-center justify-between border-b border-space-700 px-5 py-4">
