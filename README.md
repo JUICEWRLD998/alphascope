@@ -296,12 +296,17 @@ AlphaScope sends real-time market alerts to a shared Telegram channel. The notif
 This dual-tier approach keeps in-app comprehensive while keeping Telegram low-noise for the channel.
 
 ### How It Works
-1. Browser-based polling (every 60s) or Vercel cron jobs (every 5 minutes)
+1. Browser-based polling (every 60 seconds)
 2. `/api/notifications` endpoint fetches trending + new tokens from Birdeye
 3. Scores each token and filters to high-signal alerts
-4. Deduplicates using in-process ID tracking to prevent spam
+4. Deduplicates using in-process memory tracking to prevent spam
 5. Dispatches qualifying alerts to Telegram (non-blocking, doesn't affect user latency)
 6. Returns in-app notifications immediately
+
+### How Telegram Alerts Work
+- Alerts are sent **only when users are actively using the app** (via browser polling)
+- The notification system runs on client-side polling, so Telegram messages appear within ~60 seconds of qualifying events
+- To receive continuous 24/7 alerts, the channel link must be monitored independently
 
 ### Join the Channel
 📲 **[AlphaScope Alerts on Telegram](https://t.me/+1FkYzkxGf80zNTc0)**
@@ -313,22 +318,20 @@ This dual-tier approach keeps in-app comprehensive while keeping Telegram low-no
 ### Deploy on Vercel (Recommended)
 1. Push to GitHub
 2. Connect repo to Vercel
-3. Add environment variables in Vercel dashboard (BIRDEYE_API_KEY, GEMINI_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
-4. Create `vercel.json` for real-time Telegram alerts:
-   ```json
-   {
-     "crons": [{
-       "path": "/api/notifications",
-       "schedule": "*/5 * * * *"
-     }]
-   }
+3. Add environment variables in Vercel dashboard:
    ```
-5. Deploy:
+   BIRDEYE_API_KEY=your_api_key_here
+   GEMINI_API_KEY=your_gemini_key_here
+   TELEGRAM_BOT_TOKEN=your_bot_token_here
+   TELEGRAM_CHAT_ID=your_chat_id_here
+   NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
+   ```
+4. Deploy:
    ```bash
    vercel deploy
    ```
 
-This enables **real-time Telegram notifications every 5 minutes** without requiring browser traffic.
+Telegram alerts will be sent when users access the app and trigger the polling endpoint.
 
 ### Deploy on Other Platforms
 ```bash
