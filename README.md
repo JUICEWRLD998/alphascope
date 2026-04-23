@@ -100,7 +100,17 @@ AlphaScope uses the **Birdeye API** to fetch real-time and historical token data
 
 ---
 
-## 🚀 Getting Started
+## � Future Roadmap
+
+1. **Multi-Chain Support** — Expand to Ethereum, Base, BSC with unified scoring
+2. **User Accounts & Portfolios** — Track P&L, save custom watchlists across devices
+3. **Advanced Alerts** — Email, Discord, webhooks, custom thresholds
+4. **Strategy Backtesting** — Validate trading rules against historical data
+5. **Mobile PWA** — On-the-go token monitoring with push notifications
+
+---
+
+## �🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+ (recommended 20 LTS)
