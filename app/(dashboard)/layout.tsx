@@ -10,7 +10,7 @@ export default function DashboardLayout({
 }) {
   return (
     <CompareProvider>
-      <div className="flex min-h-screen bg-space-950 text-slate-100 antialiased">
+      <div className="flex min-h-screen w-full overflow-x-hidden bg-space-950 text-slate-100 antialiased">
         <DashboardShell>{children}</DashboardShell>
       </div>
       <CompareTray />
