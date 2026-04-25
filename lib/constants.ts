@@ -2,6 +2,8 @@ export const APP_NAME = 'AlphaScope';
 export const APP_DESCRIPTION =
   'Professional onchain token analytics powered by real-time Birdeye data.';
 
+export const TELEGRAM_GROUP_URL = 'https://t.me/+1FkYzkxGf80zNTc0';
+
 export const BIRDEYE_BASE_URL = 'https://public-api.birdeye.so';
 
 export const SUPPORTED_CHAINS = [

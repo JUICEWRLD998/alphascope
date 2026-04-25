@@ -4,6 +4,7 @@ import NewTokenRadar from '@/components/dashboard/NewTokenRadar';
 import TrendingBreakout from '@/components/dashboard/TrendingBreakout';
 import ScoreBoard from '@/components/dashboard/ScoreBoard';
 import AnimateIn from '@/components/ui/AnimateIn';
+import TelegramInviteToast from '@/components/ui/TelegramInviteToast';
 import { MOCK_STATS, MOCK_NEW_TOKENS } from '@/lib/mock-data';
 import { getNewListings, getTrendingTokens } from '@/services/birdeye';
 import { scoreToken } from '@/lib/scoring';
@@ -163,6 +164,9 @@ export default async function DashboardPage({
       <AnimateIn delay={0.25}>
         <ScoreBoard tokens={scoredItems} />
       </AnimateIn>
+
+      {/* ── Telegram invite toast (once per user, bottom-right) ───────── */}
+      <TelegramInviteToast />
     </div>
   );
 }
