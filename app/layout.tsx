@@ -13,12 +13,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-};
-
 export const metadata: Metadata = {
   title: {
     default: "AlphaScope — Crypto Token Analytics",
@@ -65,7 +59,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen overflow-x-hidden bg-space-950 text-slate-100 antialiased" suppressHydrationWarning>
+      <body className="min-h-screen bg-space-950 text-slate-100 antialiased" suppressHydrationWarning>
         <ThemeProvider>
           {children}
         </ThemeProvider>
