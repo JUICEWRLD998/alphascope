@@ -11,8 +11,8 @@ import { scoreToken } from '@/lib/scoring';
 import type { ScoringInput } from '@/lib/scoring';
 import type { BirdeyeNewListing, BirdeyeTrendingToken, NewToken } from '@/lib/types';
 
-// Run on every request so env vars and live data are always fresh.
-export const dynamic = 'force-dynamic';
+// Revalidate every 5 minutes — balances freshness vs Birdeye API quota.
+export const revalidate = 300;
 
 function listingToInput(t: BirdeyeNewListing): ScoringInput {
   return {

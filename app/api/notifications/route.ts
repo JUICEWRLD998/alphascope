@@ -97,6 +97,12 @@ export async function GET(req: NextRequest) {
   const notifications: AppNotification[] = [];
   const now = Date.now();
 
+  // Cache this response at the CDN layer for 5 minutes so multiple users
+  // share the same result rather than each triggering fresh Birdeye calls.
+  const responseHeaders = {
+    'Cache-Control': 's-maxage=300, stale-while-revalidate=600',
+  };
+
   // Fetch both data sources in parallel
   const [newRes, trendRes] = await Promise.all([
     getNewListings({ chain, window: '6h', limit: 30 }),
@@ -244,7 +250,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json(
     { notifications },
-    { headers: { 'Cache-Control': 'no-store' } },
+    { headers: responseHeaders },
   );
 }
 

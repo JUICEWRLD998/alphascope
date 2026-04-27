@@ -17,5 +17,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Return the items array directly for convenience
-  return Response.json(result.data.items ?? result.data);
+  return Response.json(result.data.items ?? result.data, {
+    headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=600' },
+  });
 }

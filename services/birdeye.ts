@@ -284,7 +284,7 @@ export interface GetNewListingsOptions {
 /**
  * Fetch tokens that have been newly listed on DEXes within the given window.
  * Endpoint: /defi/v2/tokens/new_listing
- * Cache: revalidates every 15 s (new tokens move fast).
+ * Cache: revalidates every 5 min — reduces Birdeye compute unit consumption.
  */
 export async function getNewListings(
   options: GetNewListingsOptions = {},
@@ -293,7 +293,7 @@ export async function getNewListings(
 
   const result = await birdeyeFetch<BirdeyeNewListingResponse>('/defi/v2/tokens/new_listing', {
     chain,
-    revalidate: 15,
+    revalidate: 300,
     tags: [`new-listings-${chain}`],
     params: {
       sort_by: 'liquidity_added_at',
@@ -324,7 +324,7 @@ export interface GetTrendingTokensOptions {
 /**
  * Fetch the top trending tokens by volume and rank.
  * Endpoint: /defi/token_trending
- * Cache: revalidates every 30 s.
+ * Cache: revalidates every 5 min — reduces Birdeye compute unit consumption.
  */
 export async function getTrendingTokens(
   options: GetTrendingTokensOptions = {},
@@ -333,7 +333,7 @@ export async function getTrendingTokens(
 
   const result = await birdeyeFetch<BirdeyeTrendingResponse>('/defi/token_trending', {
     chain,
-    revalidate: 30,
+    revalidate: 300,
     tags: [`trending-${chain}`],
     params: {
       sort_by: 'rank',
@@ -365,7 +365,7 @@ export interface GetTokenOverviewOptions {
 /**
  * Fetch price, volume, market cap, and holder data for a single token.
  * Endpoint: /defi/token_overview
- * Cache: revalidates every 60 s (price changes frequently but not sub-minute).
+ * Cache: revalidates every 2 min.
  */
 export async function getTokenOverview(
   address: string,
@@ -375,7 +375,7 @@ export async function getTokenOverview(
 
   const result = await birdeyeFetch<BirdeyeToken>('/defi/token_overview', {
     chain,
-    revalidate: 60,
+    revalidate: 120,
     tags: [`token-${address}`],
     params: { address },
   });
