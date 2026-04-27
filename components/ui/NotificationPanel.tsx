@@ -17,7 +17,7 @@ import { cn, timeAgo } from '@/lib/utils';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
-const POLL_MS = 60_000;
+const POLL_MS = 300_000; // 5 minutes — reduced from 60s to lower API rate limit pressure
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
